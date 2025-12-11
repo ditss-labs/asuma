@@ -2457,11 +2457,11 @@ if (isCmd && global.plugins[command]) {
             m.pluginExecuted = true
             let plugin = global.plugins[command]
             if (!userdb.limit) userdb.limit = 10
-            if (plugin.owner && !isOwner) return m.reply(global.mess.owner)
-            if (plugin.premium && !isPremium) return m.reply(global.mess.premium)
-            if (plugin.group && !m.isGroup) return m.reply(global.mess.ingroup)
-            if (plugin.admin && !m.isAdmin) return m.reply(global.mess.admin)
-            if (plugin.botAdmin && !m.isBotAdmin) return m.reply(global.mess.BotAdmin)
+            if (plugin.owner && !isOwner) return m.reply(global.ress.owner)
+            if (plugin.premium && !isPremium) return m.reply(global.ress.premium)
+            if (plugin.group && !m.isGroup) return m.reply(global.ress.ingroup)
+            if (plugin.admin && !m.isAdmin) return m.reply(global.ress.admin)
+            if (plugin.botAdmin && !m.isBotAdmin) return m.reply(global.ress.BotAdmin)
             if (plugin.nsfw && (!m.isGroup || !isNsfw)) return m.reply("❌ NSFW belum aktif di grup ini!")
             if (plugin.limit) {
                 if (userdb.limit < plugin.limit)

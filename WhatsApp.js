@@ -1002,6 +1002,39 @@ fs.watch(pluginPath, async (eventType, filename) => {
 });
         
         switch (command) {
+				case 'editimg': {
+    if (!q) return m.reply("Masukkan prompt!\nContoh: *.editimg Using the model, create a 1/7 scale commercialized figurine based on the character(s) shown in the image, rendered in a realistic style within a real-life environment. The figurine is displayed on a computer desk and stands on a round, fully transparent acrylic base with no text or markings. On the computer monitor, show the 3D modeling process of this figurine, including visible modeling tools, wireframes, and interface elements. Next to the monitor, place a BANDAI-style toy packaging box printed with the original character artwork. The packaging should feature high-quality, two-dimensional flat illustrations in authentic commercial packaging style.*");
+    try {
+        let usedPrompt = q.trim();
+
+        let targetMsg = m.quoted ? m.quoted : m;
+        let mime = (targetMsg.msg || targetMsg).mimetype || "";
+        if (!mime || !/image\/(webp|jpeg|png)/.test(mime))
+            return reply("Kirim atau reply gambar dengan caption:\n*.editimg (prompt)*");
+        await reply("⏳ Sedang memproses gambar…");
+        let media = await targetMsg.download();
+        let uploaded = await UguuSe(media);
+        let imgURL = uploaded.url;
+        let { data } = await axios.get("https://api.asuma.my.id/v1/ai/imgeditor", {
+            params: {
+                url: imgURL,
+                prompt: usedPrompt
+            }
+        });
+
+        if (!data.status || !data.url)
+            return reply("❌ API Error: gagal menghasilkan gambar");
+        await Ditss.sendMessage(m.chat, {
+            image: { url: data.url },
+            caption: `✨ *Edit Berhasil!*`
+        }, { quoted: m });
+
+    } catch (e) {
+        console.log(e);
+        reply("❌ Terjadi kesalahan!");
+    }
+}
+break;
 
       case 'tourl': {
     const quoted = m.quoted ? m.quoted : m;

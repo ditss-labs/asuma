@@ -2290,7 +2290,7 @@ case 'nsfw': {
         case 'trap': {
             try {
                 const kategori = args[0].toLowerCase()
-                const res = await fetch(`${api.ditss}/api/nsfw/${kategori}`)
+                const res = await fetch(`https://api.asuma.my.id/v2/nsfw/${kategori}`)
                 const arrayBuffer = await res.arrayBuffer()
                 const buffer = Buffer.from(arrayBuffer)
 
@@ -2320,7 +2320,7 @@ case 'nsfw': {
 
         case 'blowjob': {
             try {
-                const res = await fetch(`${api.ditss}/api/nsfw/blowjob`)
+                const res = await fetch(`https://api.asuma.my.id/v2/nsfw/blowjob`)
                 const arrayBuffer = await res.arrayBuffer()
                 const buffer = Buffer.from(arrayBuffer)
 

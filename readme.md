@@ -5,11 +5,11 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ditss-cloud/asuma.esm/stargazers"><img src="https://img.shields.io/github/stars/ditss-cloud/asuma.esm?style=for-the-badge" alt="Stars"/></a>
-  <a href="https://github.com/ditss-cloud/asuma.esm/network/members"><img src="https://img.shields.io/github/forks/ditss-cloud/asuma.esm?style=for-the-badge" alt="Forks"/></a>
-  <a href="https://github.com/ditss-cloud/asuma.esm/actions"><img src="https://img.shields.io/github/actions/workflow/status/ditss-cloud/asuma.esm/node.js.yml?style=for-the-badge&label=build" alt="Build Status"/></a>
-  <a href="https://www.codefactor.io/repository/github/ditss-cloud/asuma.esm"><img src="https://www.codefactor.io/repository/github/ditss-cloud/asuma.esm/badge?style=for-the-badge" alt="CodeFactor"/></a>
-  <a href="https://github.com/ditss-cloud/asuma.esm"><img src="https://img.shields.io/github/license/ditss-cloud/asuma.esm?style=for-the-badge" alt="License"/></a>
+  <a href="https://github.com/ditss-labs/asuma/stargazers"><img src="https://img.shields.io/github/stars/ditss-labs/asuma?style=for-the-badge" alt="Stars"/></a>
+  <a href="https://github.com/ditss-labs/asuma/network/members"><img src="https://img.shields.io/github/forks/ditss-labs/asuma?style=for-the-badge" alt="Forks"/></a>
+  <a href="https://github.com/ditss-cloud/asuma.esm/actions"><img src="https://img.shields.io/github/actions/workflow/status/ditss-labs/asuma/node.js.yml?style=for-the-badge&label=build" alt="Build Status"/></a>
+  <a href="https://www.codefactor.io/repository/github/ditss-labs/asuma"><img src="https://www.codefactor.io/repository/github/ditss-labs/asuma/badge?style=for-the-badge" alt="CodeFactor"/></a>
+  <a href="https://github.com/ditss-labs/asuma"><img src="https://img.shields.io/github/license/ditss-labs/asuma?style=for-the-badge" alt="License"/></a>
   <a href="https://github.com/WhiskeySockets/Baileys"><img src="https://img.shields.io/badge/baileys-whatsapp%20api-blue?style=for-the-badge" alt="Baileys"/></a>
   <img src="https://img.shields.io/badge/node-%3E=20.x-green?style=for-the-badge" alt="Node.js 20+"/>
 </p>
@@ -43,7 +43,7 @@ Lihat lebih banyak [di folder assets](assets/) atau [di wiki](https://github.com
 Langsung jalankan dengan satu baris:
 
 ```bash
-git clone https://github.com/ditss-cloud/asuma.esm && cd asuma-esm && npm install && node index.js
+git clone https://github.com/ditss-labs/asuma && cd asuma && npm install && node index.js
 ```
 
 > **Pastikan Node.js versi 20.x atau terbaru.**
@@ -64,10 +64,10 @@ git clone https://github.com/ditss-cloud/asuma.esm && cd asuma-esm && npm instal
 
 ## 📊 Statistik Repo
 
-- ⭐ **Stars:** [![Stars](https://img.shields.io/github/stars/ditss-cloud/asuma.esm?style=social)](https://github.com/ditss-cloud/asuma.esm/stargazers)
-- 🍴 **Forks:** [![Forks](https://img.shields.io/github/forks/ditss-cloud/asuma.esm?style=social)](https://github.com/ditss-cloud/asuma.esm/network/members)
-- 👀 **Watchers:** ![Watchers](https://img.shields.io/github/watchers/ditss-cloud/asuma.esm)
-- 🛠️ **Contributors:** ![Contributors](https://img.shields.io/github/contributors/ditss-cloud/asuma.esm)
+- ⭐ **Stars:** [![Stars](https://img.shields.io/github/stars/ditss-labs/asuma?style=social)](https://github.com/ditss-labs/asuma/stargazers)
+- 🍴 **Forks:** [![Forks](https://img.shields.io/github/forks/ditss-labs/asuma?style=social)](https://github.com/ditss-labs/asuma/network/members)
+- 👀 **Watchers:** ![Watchers](https://img.shields.io/github/watchers/ditss-labs/asuma)
+- 🛠️ **Contributors:** ![Contributors](https://img.shields.io/github/contributors/ditss-labs/asuma)
 
 ---
 
@@ -111,8 +111,8 @@ asuma-esm/
 
 1. **Clone repository**
     ```bash
-    git clone https://github.com/ditss-cloud/asuma.esm
-    cd asuma-esm
+    git clone https://github.com/ditss-labs/asuma
+    cd asuma
     ```
 2. **Install dependencies**
     ```bash

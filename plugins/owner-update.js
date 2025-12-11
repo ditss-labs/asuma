@@ -29,7 +29,7 @@ let updateHandler = async (m, { conn: Ditss, args, usedPrefix }) => {
             await Ditss.sendMessage(m.chat, { text: `📁 Ditemukan ${filesToCheck.length} file\n🔄 Membandingkan dengan file lokal...` }, { edit: processMsg.key });
             
             const filesToUpdate = [];
-            const skipPatterns = [/^database\//, /^config\.js$/, /^baileys_store\.json$/, /^\.tmp\//, /^\.git\//, /^node_modules\//];
+            const skipPatterns = [/^database\//, /^database\.json$/, /^baileys_store\.json$/, /^\.tmp\//, /^\.git\//, /^node_modules\//];
             
             for (const file of filesToCheck) {
                 const filePath = file.path;

@@ -15,7 +15,7 @@ let removebg = async (m, { conn: Ditss, usedPrefix, command }) => {
     let uploadedUrl = await UguuSe(media);
     if (!uploadedUrl.url) return m.reply('❌ Gagal upload media ke server.');
 
-    let apiUrl = `${api.ditss}/imagecreator/removebg?apikey=DitssGanteng&url=${encodeURIComponent(uploadedUrl.url)}`
+    let apiUrl = `https://api.asuma.my.id/v1/image/removebg?url=${encodeURIComponent(uploadedUrl.url)}`
     let res = await fetch(apiUrl);
     let json = await res.json();
 

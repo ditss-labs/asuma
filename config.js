@@ -2,16 +2,16 @@ import chalk from 'chalk';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { watchFile, unwatchFile } from 'fs'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-// system 
-global.autogempa = false
-global.pairingQr = true
+// system
+global.autogempa = true
 
 
 
-global.owner = "6281513607731"
+global.owner = "447920601019"
 global.info = {
     owner: [global.owner],
     namabot: 'asuma - md',
@@ -75,11 +75,9 @@ global.ress = {
 global.tempatDB = 'database.json' // Taruh url mongodb di sini jika menggunakan mongodb. Format : 'mongodb+srv://...'
 global.tempatStore = 'baileys_store.json' // Taruh url mongodb di sini jika menggunakan mongodb. Format : 'mongodb+srv://...'
 
-// Hot reload opsional
-fs.watchFile(__filename, () => {
-    fs.unwatchFile(__filename);
-    console.log(chalk.redBright(`Config diperbarui: ${__filename}`));
-    import(`${import.meta.url}?update=${Date.now()}`)
-        .then(() => console.log('Config berhasil reload!'))
-        .catch(err => console.error('Gagal reload config:', err));
-});
+let file = fileURLToPath(import.meta.url)
+watchFile(file, () => {
+    unwatchFile(file)
+    console.log(chalk.redBright("Update 'config.js'"))
+    import(`${file}?update=${Date.now()}`)
+})

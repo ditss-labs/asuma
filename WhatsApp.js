@@ -1,3 +1,4 @@
+// jembut lu cukur ngabb🗿👊
 import './config.js';
 import { AutoGempa } from "./lib/autoGempa.js";
 import chalk from 'chalk';

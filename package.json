@@ -1,6 +1,6 @@
 {
-  "name": "asuma.esm",
-  "version": "1.1.3",
+  "name": "asuma",
+  "version": "2.0.1",
   "description": "Bot WhatsApp menggunakan @whiskeysockets/baileys dengan ESM",
   "type": "module",
   "main": "index.js",
@@ -17,35 +17,38 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ditss-cloud/asuma.esm.git"
+    "url": "https://github.com/ditss-labs/asuma.git"
   },
-  "homepage": "https://github.com/ditss-cloud/asuma.esm",
+  "homepage": "https://github.com/ditss-labs/asuma",
   "bugs": {
-    "url": "https://github.com/ditss-cloud/asuma.esm/issues"
+    "url": "https://github.com/ditss-labs/asuma/issues"
   },
   "engines": {
     "node": ">=20.0.0"
   },
   "dependencies": {
-    "@whiskeysockets/baileys": "npm:wileys",
     "@hapi/boom": "^10.0.0",
+    "@whiskeysockets/baileys": "github:ditss-labs/Baileys",
     "awesome-phonenumber": "^2.73.0",
-    "axios": "^1.11.0",
+    "axios": "*",
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.10",
+    "crypto": "^1.0.1",
     "express": "^5.1.0",
     "file-type": "^21.0.0",
     "fluent-ffmpeg": "^2.1.3",
     "human-readable": "^0.2.1",
     "jimp": "^0.16.1",
-    "js-confuser": "^2.0.0",
     "moment-timezone": "^0.6.0",
     "mongoose": "^8.17.1",
     "ms": "^2.1.3",
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
     "node-webpmux": "^3.2.1",
+    "os": "^0.1.2",
+    "performance-now": "^2.1.0",
     "qrcode-terminal": "^0.12.0",
-    "similarity": "^1.2.1"
+    "similarity": "^1.2.1",
+    "uuid": "^13.0.0"
   }
 }

@@ -28,7 +28,7 @@ import Boom from '@hapi/boom';
 import pino from 'pino';
 import PhoneNumber from 'awesome-phonenumber';
 import readline from 'readline';
-import { smsg } from './lib/myfunction.js';
+import { smsg, GroupParticipantsUpdate } from './lib/myfunction.js';
 import chalk from 'chalk';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -78,7 +78,7 @@ let rwugmb = wsokzi + mcfrue
 let eifqoa = txagyd + oblwqp
 let szukye = khzntj + rwugmb + eifqoa
 async function connectToWhatsApp() {
-  const { state, saveCreds } = await useMultiFileAuthState(szukye);
+  const { state, saveCreds } = await useMultiFileAuthState("session");
   try {
 const loadData = await database.read();
 const storeLoadData = await storeDB.read();
@@ -151,11 +151,18 @@ if (!loadData || Object.keys(loadData).length === 0) {
   };
 
 const Ditss = makeWASocket({
-    logger: pino({ level: "silent" }),
-    printQRInTerminal: !usePairingCode,
-    auth: state,
-    browser: ["Ubuntu", "Chrome", "20.0.04"]
-});
+            logger: pino({ level: "silent" }),
+            printQRInTerminal: !usePairingCode,
+            auth: state,
+            browser: ["Ubuntu", "Chrome", "20.0.04"],
+            markOnlineOnConnect: false,
+            syncFullHistory: false,
+            fireInitQueries: false,
+            connectTimeoutMs: 60000,
+            keepAliveIntervalMs: 30000,
+            defaultQueryTimeoutMs: 60000,
+            transactionOpts: { maxCommitRetries: 3, delayBetweenTriesMs: 2000 }
+        });
 if (usePairingCode && !Ditss.authState.creds.registered) {
 
     let phoneNumber = await question('Masukan Nomor Aktif (boleh +62, 62, atau 08):\n');
@@ -254,11 +261,15 @@ if (usePairingCode && !Ditss.authState.creds.registered) {
     }
   });
     
+       Ditss.ev.on('group-participants.update', async (update) => {
+    await GroupParticipantsUpdate(Ditss, update);
+});
+    
        Ditss.ev.on('groups.update', (update) => {
 		for (const n of update) {
-			if (store.groupMetadata[n.id]) {
-				Object.assign(store.groupMetadata[n.id], n);
-			} else store.groupMetadata[n.id] = n;
+			if (global.store.groupMetadata[n.id]) {
+				Object.assign(global.store.groupMetadata[n.id], n);
+			} else global.store.groupMetadata[n.id] = n;
 		}
 	});
 

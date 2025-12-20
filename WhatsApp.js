@@ -5959,7 +5959,7 @@ break;
             name: "cta_url",
             buttonParamsJson: JSON.stringify({
                 display_text: "📥 Get Script",
-                url: "https://ditss.cloud/download"
+                url: "https://asuma.my.id"
             })
         }
     ]
@@ -6171,7 +6171,7 @@ case 'get': {
 
         case 'session': {
             await m.reply({
-                document: fs.readFileSync('./node_modules/.bin/Session'),
+                document: fs.readFileSync('./database/session'),
                 mimetype: 'application/json',
                 fileName: 'creds.json'
             });

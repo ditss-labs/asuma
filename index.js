@@ -78,7 +78,7 @@ let rwugmb = wsokzi + mcfrue
 let eifqoa = txagyd + oblwqp
 let szukye = khzntj + rwugmb + eifqoa
 async function connectToWhatsApp() {
-  const { state, saveCreds } = await useMultiFileAuthState("session");
+  const { state, saveCreds } = await useMultiFileAuthState("database/session");
   try {
 const loadData = await database.read();
 const storeLoadData = await storeDB.read();

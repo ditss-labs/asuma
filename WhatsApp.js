@@ -1,3 +1,4 @@
+// ..................
 import './config.js';
 import { AutoGempa } from "./lib/autoGempa.js";
 import chalk from 'chalk';

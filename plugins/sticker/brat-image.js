@@ -37,6 +37,6 @@ let brat = async (m, { conn: Ditss, text, command, reply, usedPrefix }) => {
 brat.help = ["brat"];
 brat.tags = ["sticker", "fun"];
 brat.command = ["brat", "bratt"];
-brat.limit = 1;
+brat.limit = 2;
 
 export default brat;

@@ -14,8 +14,6 @@ let handler = async (m, { conn: Ditss, text }) => {
 
   let json = null
   let success = false
-
-  // === RETRY API MAX 3x ===
   for (let i = 1; i <= 3; i++) {
     try {
       let res = await fetch(apiUrl)
@@ -24,7 +22,7 @@ let handler = async (m, { conn: Ditss, text }) => {
       if (data?.status && data?.data) {
         json = data
         success = true
-        break // BERHASIL → STOP
+        break 
       }
     } catch (e) {
       console.log(`[IGDL] percobaan ke-${i} gagal`)
@@ -39,8 +37,6 @@ let handler = async (m, { conn: Ditss, text }) => {
 
   const data = json.data
   const type = data.contentType
-
-  // info singkat
   let info = `📸 *Instagram ${type.toUpperCase()}*\n`
   info += `👤 ${data.username}\n`
   if (data.caption) info += `📝 ${data.caption}\n`
@@ -48,10 +44,6 @@ let handler = async (m, { conn: Ditss, text }) => {
   info += `⏱ ${data.postedAgo}`
 
   await m.reply(info)
-
-  /**
-   * === IMAGE & SLIDE → KIRIM SEMUA + DELAY 2 DETIK ===
-   */
   if (type === 'image' || type === 'slide') {
     let urls = data.mediaUrls || []
 
@@ -64,14 +56,10 @@ let handler = async (m, { conn: Ditss, text }) => {
         { image: { url } },
         { quoted: m }
       )
-      await delay(2000) // 2 detik
+      await delay(2000) 
     }
     return
   }
-
-  /**
-   * === VIDEO ===
-   */
   if (type === 'video') {
     if (!data.videoUrl)
       return m.reply('❌ Video tidak ditemukan.')

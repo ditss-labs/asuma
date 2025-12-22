@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
 const delsesi = async (m, { conn: Ditss, editp }) => {
-  const folder = path.resolve(process.cwd(), "node_modules/.bin/Session")
+  const folder = path.resolve(process.cwd(), "database/session")
 
   if (!existsSync(folder)) {
     return m.reply(`❌ Folder session tidak ditemukan di: ${folder}`)

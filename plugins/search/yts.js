@@ -29,14 +29,19 @@ let ytsearch = async (m, { conn: Ditss, text, usedPrefix, command }) => {
                 id: `.ytmp3 ${video.url}`
               },
               { 
-                title: "🎬 Download Video (360p)", 
+                title: "🎬 Download Video (480p)", 
                 description: "Kualitas standar", 
-                id: `.ytmp4 ${video.url} 360`
+                id: `.ytmp4 ${video.url} 480`
               },
               { 
                 title: "🎬 Download Video (720p)", 
-                description: "Kualitas HD", 
+                description: "Kualitas standar", 
                 id: `.ytmp4 ${video.url} 720`
+              },
+              { 
+                title: "🎬 Download Video (1080p)", 
+                description: "Kualitas HD", 
+                id: `.ytmp4 ${video.url} 1080`
               }
             ]
           }

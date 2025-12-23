@@ -1,10 +1,52 @@
+const originalConsoleLog = console.log;
+const originalConsoleInfo = console.info;
+const originalConsoleDebug = console.debug;
+
+const blockedKeywords = [
+  'SessionEntry',
+  '_chains',
+  'chainKey',
+  'ephemeralKeyPair',
+  'registrationId',
+  'currentRatchet',
+  'lastRemoteEphemeralKey',
+  'indexInfo',
+  'baseKey',
+  'rootKey',
+  'privKey',
+  'pubKey',
+  'Buffer',
+  'Closing session:',
+  'tebakkalimat',
+  'Perintah:',
+  'Argument:'
+];
+
+const filterLog = (...args) => {
+  const message = args.join(' ');
+  const shouldBlock = blockedKeywords.some(keyword => message.includes(keyword));
+  return !shouldBlock;
+};
+
+console.log = (...args) => {
+  if (filterLog(...args)) originalConsoleLog(...args);
+};
+
+console.info = (...args) => {
+  if (filterLog(...args)) originalConsoleInfo(...args);
+};
+
+console.debug = (...args) => {
+  if (filterLog(...args)) originalConsoleDebug(...args);
+};
+
 process.on('uncaughtException', (err) => {
-  console.error('❌ Uncaught Exception:', err)
-})
+  console.error('❌ Uncaught Exception:', err);
+});
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('⚠️ Unhandled Rejection:', reason)
-})
+  console.error('⚠️ Unhandled Rejection:', reason);
+});
 /*
  * -----------------------------------------------------------------------------
  *  Author         : Ditss
@@ -345,3 +387,5 @@ fs.watchFile(__filename, () => {
     console.log('Kode diperbarui!');
   }).catch(err => console.error('Gagal memperbarui:', err));
 });
+
+		

@@ -16,10 +16,7 @@ const blockedKeywords = [
   'privKey',
   'pubKey',
   'Buffer',
-  'Closing session:',
-  'tebakkalimat',
-  'Perintah:',
-  'Argument:'
+  'Closing session:'
 ];
 
 const filterLog = (...args) => {

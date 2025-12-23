@@ -1,3 +1,5 @@
+import fetch from 'node-fetch'
+
 let handler = async (m, { conn: Ditss, text }) => {
   if (!text)
     return m.reply(

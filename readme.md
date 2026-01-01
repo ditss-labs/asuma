@@ -709,7 +709,7 @@ Special Mentions:
 
 </details>
 
----
+
 
 📄 License
 
@@ -742,7 +742,7 @@ SOFTWARE.
 
 </details>
 
----
+
 
 <div align="center">
 
@@ -750,14 +750,14 @@ SOFTWARE.
 
 https://api.star-history.com/svg?repos=ditss-labs/asuma&type=Date
 
----
+
 
 🚀 Ready to Build?
 
 https://img.shields.io/badge/Deploy_Now-25D366?style=for-the-badge&logo=whatsapp&logoColor=white
 https://img.shields.io/badge/Join_Community-0088cc?style=for-the-badge&logo=telegram&logoColor=white
 
----
+
 
 Made with ❤️ by Ditss • Version 1.1.5 • Stable Release
 

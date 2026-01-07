@@ -78,29 +78,50 @@ export async function LoadDataBase(Ditss, m) {
 		if (m.isGroup) {
 			let group = global.db.groups[m.chat] || {};
 			global.db.groups[m.chat] = group;
-			
-			const defaultGroup = {
-				url: '',
+            const defaultGroup = {
+                url: '',
                 pc: 0,
-				text: {},
-				warn: {},
-				tagsw: {},
-				nsfw: false,
+                text: {},
+                warn: {},
+                tagsw: {},
+                auto: {
+                    gempa: {
+                        enable: false,
+                        data: '' 
+                    },
+                    berita: {
+                        enable: false,
+                        data: ''
+                    },
+                    cuaca: {
+                        enable: false,
+                        data: ''
+                    },
+                    jadwalsholat: {
+                        enable: false,
+                        data: ''
+                    },
+                    saham: {
+                        enable: false,
+                        data: ''
+                    }
+                },
+                nsfw: false,
                 antiporhub: false,
-				mute: false,
-				leave: false,
-				setinfo: false,
-				antilink: false,
-				demote: false,
-				antitoxic: false,
-				promote: false,
-				welcome: false,
-				antivirtex: false,
-				antitagsw: false,
-				antidelete: false,
-				antihidetag: false,
-				waktusholat: false,
-			};
+                mute: false,
+                leave: false,
+                setinfo: false,
+                antilink: false,
+                demote: false,
+                antitoxic: false,
+                promote: false,
+                welcome: false,
+                antivirtex: false,
+                antitagsw: false,
+                antidelete: false,
+                antihidetag: false,
+                waktusholat: false,
+            };
 			for (let key in defaultGroup) {
 				if (!(key in group)) group[key] = defaultGroup[key];
 			}

@@ -76,7 +76,7 @@ import { app, server, PORT } from './source/server.js';
 import { makeUsersProxy } from "./lib/usersdb.js";
 
 const { proto, makeWASocket, useMultiFileAuthState, jidDecode, DisconnectReason } = baileys;
-
+//import makeWASocket, { DisconnectReason } from '@whiskeysockets/baileys';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const usePairingCode = true;
@@ -92,30 +92,9 @@ const question = (text) => {
     });
   });
 };
-let ybzfuw = "./n"
-let rmctao = "od"
-let uwrpns = "e_"
-let gdxvra = "mo"
-let lnepzc = "du"
-let hvnqto = "le"
-let zksjpw = "s/"
-let kvyqhm = ".b"
-let qpxzmu = "in"
-let xhmvyo = "/Se"
-let tbjeyl = "ss"
-let dfogma = "ion"
+
 const storeDB = dataBase(global.tempatStore);
 const database = dataBase(global.tempatDB);
-let jqnrks = ybzfuw + rmctao + uwrpns
-let pldvxa = gdxvra + lnepzc
-let wsokzi = hvnqto + zksjpw
-let mcfrue = kvyqhm + qpxzmu
-let txagyd = xhmvyo + tbjeyl
-let oblwqp = dfogma
-let khzntj = jqnrks + pldvxa
-let rwugmb = wsokzi + mcfrue
-let eifqoa = txagyd + oblwqp
-let szukye = khzntj + rwugmb + eifqoa
 async function connectToWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState("database/session");
   try {
@@ -204,19 +183,20 @@ const Ditss = makeWASocket({
         });
 if (usePairingCode && !Ditss.authState.creds.registered) {
 
-    let phoneNumber = await question('Masukan Nomor Aktif (boleh +62, 62, atau 08):\n');
-
-    // NORMALISASI NOMOR
-    phoneNumber = phoneNumber
-        .replace(/[^0-9+]/g, "") 
-        .replace(/^0/, "62") 
-        .replace(/^\+/, "")      
-        .replace(/^620/, "62");
-    if (!phoneNumber.startsWith("62")) {
-        phoneNumber = "62" + phoneNumber;
+    let phoneNumber = await question(
+        'Masukan Nomor Aktif (contoh: +628xxx / 628xxx / 447xxx / 337xxx):\n'
+    );
+    phoneNumber = phoneNumber.replace(/[^0-9+]/g, "");
+    if (phoneNumber.startsWith("+")) {
+        phoneNumber = phoneNumber.slice(1);
     }
+    if (phoneNumber.length < 8 || phoneNumber.length > 15) {
+        throw new Error("Nomor tidak valid (panjang salah)");
+    }
+
     const pair = "ASUMAAAA"; // 8 huruf
     const code = await Ditss.requestPairingCode(phoneNumber.trim(), pair);
+
     console.log(`Pairing code: ${code}`);
 }
 
@@ -385,4 +365,5 @@ fs.watchFile(__filename, () => {
   }).catch(err => console.error('Gagal memperbarui:', err));
 });
 
-		
+
+	  

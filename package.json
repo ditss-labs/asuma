@@ -28,11 +28,12 @@
   },
   "dependencies": {
     "@hapi/boom": "^10.0.0",
-    "@whiskeysockets/baileys": "github:ditss-labs/Baileys",
+    "@whiskeysockets/baileys": "npm:wileys@latest",
     "awesome-phonenumber": "^2.73.0",
     "axios": "*",
     "chalk": "^4.1.2",
     "cheerio": "^1.0.0-rc.10",
+    "chess.js": "^1.4.0",
     "crypto": "^1.0.1",
     "express": "^5.1.0",
     "file-type": "^21.0.0",
@@ -42,6 +43,7 @@
     "moment-timezone": "^0.6.0",
     "mongoose": "^8.17.1",
     "ms": "^2.1.3",
+    "node-cache": "^5.1.2",
     "node-cron": "^4.2.1",
     "node-fetch": "^3.3.2",
     "node-webpmux": "^3.2.1",
@@ -52,3 +54,4 @@
     "uuid": "^13.0.0"
   }
 }
+

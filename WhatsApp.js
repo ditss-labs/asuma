@@ -1,7 +1,9 @@
 // ..................
 import './config.js';
 import { AutoGempa } from "./lib/autoGempa.js";
+import { pangkat } from './lib/pangkat.js'
 import chalk from 'chalk';
+import { Chess, DEFAULT_POSITION } from 'chess.js';
 import os from 'os';
 import speed from 'performance-now';
 import { promises as fsPromises } from 'fs';
@@ -27,6 +29,7 @@ import { LoadDataBase } from './source/loadDatabase.js';
 import { downloadMediaMessage } from '@whiskeysockets/baileys';
 import { runtime } from './lib/utils/runtime.js'
 import { getBuffer } from './lib/fetchBuffer.js';
+import { JadiBot, StopJadiBot, ListJadiBot } from './lib/jadibot.js';
 import { detectOperator } from './lib/func/detectOperator.js';
 import { logErrorToFile } from './lib/utils/logErrorToFile.js';
 import { fetchJson } from './lib/utils/fetchJson.js';
@@ -167,7 +170,7 @@ body = body.trim();
         const readmore = more.repeat(4001)
         const timestampp = speed();
         const latensi = speed() - timestampp
-        
+        m.semder = userdb.id
         
         const FileSize = (number) => {
         var SI_POSTFIXES = ["B", " KB", " MB", " GB", " TB", " PB", " EB"]
@@ -232,16 +235,306 @@ try {
         
         // Filter mode self
 if (set.public && !isCreator) return
+if (m.key.fromMe) return;
+if (m.key.id?.length === 16) return;
+if (m.key.remoteJid === 'status@broadcast') return;
+            if (m.isGroup && global.db.groups[m.chat].mute) {
+                if (!m.isAdmin && !isCreator) return;
+            }
+if (set.grouponly && !m.isGroup && !isCreator) return
+if (set.privateonly && m.isGroup && !isCreator) return
 let UsersDbDefault = global.db.users[m.sender] || {}
 
 const limitUser = UsersDbDefault.vip ? global.limit.vip : checkStatus(m.sender, premium) ? global.limit.premium : global.limit.free
 const moneyUser = UsersDbDefault.vip ? global.money.vip : checkStatus(m.sender, premium) ? global.money.premium : global.money.free
-
+const rpgDefault = {
+  registered: false,
+  characterName: m.pushName || 'Adventurer',
+  characterClass: 'Novice',
+  level: 1,
+  exp: 0,
+  expToNext: 100,
+  hp: 100,
+  maxHp: 100,
+  mp: 50,
+  maxMp: 50,
+  stamina: 100,
+  maxStamina: 100,
+  gold: 100,
+  stats: {
+    strength: 5,
+    intelligence: 5,
+    agility: 5,
+    luck: 5,
+    endurance: 5
+  },
+  activities: {
+    fishing: {
+      level: 0,
+      exp: 0,
+      mastery: 0,
+      bait: 5,
+      rod: 'Basic Fishing Rod',
+      lastFished: 0,
+      totalFishCaught: 0,
+      records: {
+        biggestFish: { name: '', weight: 0 },
+        rareFish: []
+      },
+      spotsUnlocked: ['River', 'Pond'],
+      dailyLimit: 20,
+      caughtToday: 0
+    },
+    farming: {
+      level: 0,
+      exp: 0,
+      seeds: {
+        rice: 10,
+        wheat: 5,
+        vegetable: 3
+      },
+      farms: [
+        {
+          id: 1,
+          crop: null,
+          plantedAt: 0,
+          harvestTime: 0,
+          status: 'empty'
+        },
+        {
+          id: 2,
+          crop: null,
+          plantedAt: 0,
+          harvestTime: 0,
+          status: 'empty'
+        }
+      ],
+      tools: {
+        hoe: 'Basic Hoe',
+        wateringCan: 'Basic Watering Can'
+      },
+      lastHarvested: 0,
+      totalHarvests: 0
+    },
+    busking: {
+      level: 0,
+      exp: 0,
+      instrument: 'Basic Guitar',
+      songsKnown: ['Basic Melody'],
+      popularity: 0,
+      lastPerformed: 0,
+      tipsToday: 0,
+      totalTips: 0,
+      performances: {
+        successful: 0,
+        failed: 0
+      },
+      dailyStreak: 0,
+      favoriteSpot: null
+    },
+    hunting: {
+      level: 0,
+      exp: 0,
+      weapon: 'Basic Bow',
+      arrows: 20,
+      traps: 3,
+      lastHunted: 0,
+      preyCaught: {
+        rabbit: 0,
+        deer: 0,
+        boar: 0,
+        rare: 0
+      },
+      huntingGrounds: ['Forest Edge'],
+      trophies: [],
+      trackingSkill: 0
+    },
+    mining: {
+      level: 0,
+      exp: 0,
+      pickaxe: 'Basic Pickaxe',
+      lastMined: 0,
+      oresFound: {
+        copper: 0,
+        iron: 0,
+        gold: 0,
+        diamond: 0
+      },
+      minesUnlocked: ['Copper Mine'],
+      staminaCost: 10,
+      totalMined: 0
+    },
+    woodcutting: {
+      level: 0,
+      exp: 0,
+      axe: 'Basic Axe',
+      lastChopped: 0,
+      woodTypes: {
+        oak: 0,
+        pine: 0,
+        mahogany: 0
+      },
+      forestsUnlocked: ['Oak Forest'],
+      totalChopped: 0
+    },
+    cooking: {
+      level: 0,
+      exp: 0,
+      recipes: ['Fried Fish', 'Bread'],
+      kitchenTools: ['Basic Pot', 'Basic Pan'],
+      ingredients: {
+        fish: 0,
+        meat: 0,
+        vegetables: 0,
+        flour: 0
+      },
+      mealsCooked: 0,
+      specialRecipes: []
+    },
+    combat: {
+      level: 0,
+      exp: 0,
+      weapon: 'Wooden Sword',
+      armor: 'Leather Armor',
+      lastBattle: 0,
+      monstersDefeated: {
+        goblin: 0,
+        slime: 0,
+        wolf: 0
+      },
+      dungeonsCleared: 0,
+      pvp: {
+        wins: 0,
+        losses: 0,
+        rating: 1000
+      }
+    },
+    questing: {
+      activeQuests: [],
+      completedQuests: [],
+      failedQuests: [],
+      questPoints: 0,
+      reputation: {
+        town: 0,
+        guild: 0,
+        merchants: 0
+      }
+    },
+    trading: {
+      level: 0,
+      exp: 0,
+      shopItems: [],
+      customersServed: 0,
+      profit: 0,
+      marketStands: 0,
+      tradingRoutes: []
+    }
+  },
+  inventory: {
+    fish: {
+      common_fish: 0,
+      rare_fish: 0,
+      legendary_fish: 0
+    },
+    crops: {
+      rice: 0,
+      wheat: 0,
+      vegetables: 0
+    },
+    meats: {
+      rabbit_meat: 0,
+      deer_meat: 0,
+      boar_meat: 0
+    },
+    ores: {
+      copper_ore: 0,
+      iron_ore: 0,
+      gold_ore: 0
+    },
+    woods: {
+      oak_log: 0,
+      pine_log: 0,
+      mahogany_log: 0
+    },
+    valuables: {
+      gold_bar: 0,
+      diamond: 0,
+      rare_artifact: 0
+    },
+    weapons: [],
+    armors: [],
+    tools: [],
+    accessories: [],
+    potions: {
+      health_potion: 0,
+      mana_potion: 0,
+      stamina_potion: 0
+    },
+    quest_items: [],
+    rare_items: [],
+    capacity: 50,
+    used: 0
+  },
+  skills: {
+    fishingAccuracy: 0,
+    fishIdentification: 0,
+    farmingKnowledge: 0,
+    cropYield: 0,
+    musicalTalent: 0,
+    crowdAppeal: 0,
+    huntingPrecision: 0,
+    animalTracking: 0,
+    oreDetection: 0,
+    miningEfficiency: 0,
+    treeIdentification: 0,
+    cuttingSpeed: 0,
+    recipeMastery: 0,
+    ingredientQuality: 0
+  },
+  timers: {
+    lastActivity: 0,
+    cooldowns: {
+      fishing: 0,
+      farming: 0,
+      busking: 0,
+      hunting: 0,
+      mining: 0,
+      woodcutting: 0,
+      cooking: 0,
+      combat: 0
+    },
+    daily: {
+      lastReset: 0,
+      activitiesDone: 0,
+      rewardsClaimed: false
+    },
+    weekly: {
+      lastReset: 0,
+      completed: 0,
+      rewardsClaimed: false
+    }
+  },
+  achievements: {
+    unlocked: [],
+    progress: {},
+    achievementPoints: 0
+  },
+  equipment: {
+    weapon: 'Wooden Sword',
+    armor: 'Leather Armor',
+    accessory: null,
+    tool: 'Basic Toolset'
+  }
+}
 const defaultUser = {
     name: m.pushName,
+    id: m.sender,
     vip: false,
     ban: false,
     register: false,
+    joinTimestamp: Date.now(),
+    joinDate: new Date().toLocaleDateString('id-ID'),
+    joinTime: new Date().toLocaleTimeString('id-ID'),
     afkTime: -1,
     afkReason: '',
     level: 0,
@@ -251,14 +544,16 @@ const defaultUser = {
     lastclaim: Date.now(),
     lastbegal: Date.now(),
     lastrampok: Date.now(),
+    rpg: {},
 }
 
 for (let k in defaultUser) {
     if (!(k in UsersDbDefault)) UsersDbDefault[k] = defaultUser[k]
 }
 
-global.db.users[m.sender] = UsersDbDefault        
-        
+global.db.users[m.sender] = UsersDbDefault  
+        // m system
+        m.sender = userdb.id 
         function randomNomor(min, max = null) {
             if (max !== null) {
                 min = Math.ceil(min);
@@ -383,6 +678,13 @@ function getAllUsers() {
   }
   return users;
 }
+ async function getpp(jid) {
+  try {
+    return await Ditss.profilePictureUrl(jid, 'image')
+  } catch {
+    return `https://cdn.asuma.my.id/va7r57lra7.jpg`
+  }
+}
         
 async function detectOperatorPost(phoneNumber) {
   try {
@@ -481,14 +783,55 @@ if (
     m.chat,
     {
       audio: Buffer.from(buffer),
-      mimetype: 'audio/mpeg',
+      mimetype: 'audio/ogg; codecs=opus',
       ptt: true
     },
     { quoted: m }
   )
 }
+        
+        function formatDuration(ms) {
+    if (ms > 315360000000) {
+        return 'beberapa saat'
+    }
+    
+    const units = [
+        ['tahun', 31536000000],
+        ['bulan', 2592000000],
+        ['minggu', 604800000],
+        ['hari', 86400000],
+        ['jam', 3600000],
+        ['menit', 60000],
+        ['detik', 1000]
+    ]
+    
+    let result = []
+    let remaining = ms
+    
+    for (let [label, value] of units) {
+        let amount = Math.floor(remaining / value)
+        if (amount > 0) {
+            result.push(`${amount} ${label}`)
+            remaining %= value
+        }
+    }
+    
+    return result.length ? result.slice(0, 2).join(', ') : 'beberapa detik'
+}
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 // ===== Debug Console Logs =====
 if (isCmd && !m.fromMe) {
+    const joinTimestamp = Math.abs(Date.now() - userdb.joinTimestamp)
+    const durationText = formatDuration(joinTimestamp)
     let senderIntl = PhoneNumber('+' + sender.replace('@s.whatsapp.net', '')).getNumber('international')
     let waktuPesan = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
     let filesize = 0
@@ -517,6 +860,7 @@ if (isCmd && !m.fromMe) {
 │• Type: ${chalk.black(chalk.bgYellow(m.mtype || 'Unknown'))}
 │• Operator: ${chalk.black(chalk.bgYellow(m.operator || 'Unknown'))}
 │• Device: ${chalk.black(chalk.bgYellow(m.device || 'Unknown'))}
+│• joinTimestamp: ${chalk.black(chalk.bgYellow(durationText || 'Unknown'))}
 ╰┈┈⟐ ❲ ${chalk.bold.cyan('Debug Log')} ❳
 `.trim())
 
@@ -565,1629 +909,82 @@ if (!global._resetLimitScheduled) {
     timezone: 'Asia/Jakarta'
   })
 }
-function pangkat(rankid) {
-    var levelRole = db.users[rankid].rank
-    var rankid = 1
-    var role = {
-        rank: 'Bronze I',
-        name: 'Bronze',
-        id: 1
-    }
-    if (levelRole <= 300) {
-        role = {
-            rank: 'Bronze I',
-            name: 'Bronze',
-            id: 1
-        }
-    } else if (levelRole <= 500) {
-        role = {
-            rank: 'Bronze II',
-            name: 'Bronze',
-            id: 2
-        }
-    } else if (levelRole <= 700) {
-        role = {
-            rank: 'Bronze III',
-            name: 'Bronze',
-            id: 3
-        }
-    } else if (levelRole <= 900) {
-        role = {
-            rank: 'Silver I',
-            name: 'Silver',
-            id: 1
-        }
-    } else if (levelRole <= 1200) {
-        role = {
-            rank: 'Silver II',
-            name: 'Silver',
-            id: 2
-        }
-    } else if (levelRole <= 1500) {
-        role = {
-            rank: 'Silver III',
-            name: 'Silver',
-            id: 3
-        }
-    } else if (levelRole <= 1600) {
-        role = {
-            rank: 'Gold I',
-            name: 'Gold',
-            id: 1
-        }
-    } else if (levelRole <= 1725) {
-        role = {
-            rank: 'Gold II',
-            name: 'Gold',
-            id: 2
-        }
-    } else if (levelRole <= 1850) {
-        role = {
-            rank: 'Gold III',
-            name: 'Gold',
-            id: 3
-        }
-    } else if (levelRole <= 1975) {
-        role = {
-            rank: 'Gold IV',
-            name: 'Gold',
-            id: 4
-        }
-    } else if (levelRole <= 2100) {
-        role = {
-            rank: 'Platinum I',
-            name: 'Platinum',
-            id: 1
-        }
-    } else if (levelRole <= 2225) {
-        role = {
-            rank: 'Platinum II',
-            name: 'Platinum',
-            id: 2
-        }
-    } else if (levelRole <= 2350) {
-        role = {
-            rank: 'Platinum III',
-            name: 'Platinum',
-            id: 3
-        }
-    } else if (levelRole <= 2475) {
-        role = {
-            rank: 'Platinum IV',
-            name: 'Platinum',
-            id: 4
-        }
-    } else if (levelRole <= 2600) {
-        role = {
-            rank: 'Diamond I',
-            name: 'Diamond',
-            id: 1
-        }
-    } else if (levelRole <= 2750) {
-        role = {
-            rank: 'Diamond II',
-            name: 'Diamond',
-            id: 2
-        }
-    } else if (levelRole <= 2900) {
-        role = {
-            rank: 'Diamond III',
-            name: 'Diamond',
-            id: 3
-        }
-    } else if (levelRole <= 3050) {
-        role = {
-            rank: 'Diamond IV',
-            name: 'Diamond',
-            id: 4
-        }
-    } else if (levelRole <= 3200) {
-        role = {
-            rank: 'Heroic',
-            name: 'Heroic',
-            id: 0
-        }
-    } else if (levelRole <= 3500) {
-        role = {
-            rank: 'Heroic ✩',
-            name: 'Heroic',
-            id: 1
-        }
-    } else if (levelRole <= 4000) {
-        role = {
-            rank: 'Heroic ✩✩',
-            name: 'Heroic',
-            id: 2
-        }
-    } else if (levelRole <= 4350) {
-        role = {
-            rank: 'Heroic ✩✩✩',
-            name: 'Heroic',
-            id: 3
-        }
-    } else if (levelRole <= 5050) {
-        role = {
-            rank: 'Master ✯',
-            name: 'Master',
-            id: 1
-        }
-    } else if (levelRole <= 5400) {
-        role = {
-            rank: 'Master ✯✯',
-            name: 'Master',
-            id: 2
-        }
-    } else if (levelRole <= 6500) {
-        role = {
-            rank: 'Master ✯✯✯',
-            name: 'Master',
-            id: 3
-        }
-    } else if (levelRole <= 7150) {
-        role = {
-            rank: 'GrandMaster',
-            name: 'GrandMaster',
-            id: 0
-        }
-    } else if (levelRole <= 7700) {
-        role = {
-            rank: 'GrandMaster ✩',
-            name: 'GrandMaster',
-            id: 1
-        }
-    } else if (levelRole <= 9100) {
-        role = {
-            rank: 'GrandMaster ✩✩',
-            name: 'GrandMaster',
-            id: 2
-        }
-    } else if (levelRole <= 10800) {
-        role = {
-            rank: 'GrandMaster ✩✩✩',
-            name: 'GrandMaster',
-            id: 3
-        }
-    } else if (levelRole <= 20000) {
-        role = {
-            rank: 'GrandMaster ✩✩✩✩',
-            name: 'GrandMaster',
-            id: 4
-        }
-    } else if (levelRole <= 25000) {
-        role = {
-            rank: 'Epic I',
-            name: 'Epic',
-            id: 1
-        }
-    } else if (levelRole <= 30000) {
-        role = {
-            rank: 'Epic II',
-            name: 'Epic',
-            id: 2
-        }
-    } else if (levelRole <= 35000) {
-        role = {
-            rank: 'Epic III',
-            name: 'Epic',
-            id: 3
-        }
-    } else if (levelRole <= 40000) {
-        role = {
-            rank: 'Epic IV',
-            name: 'Epic',
-            id: 4
-        }
-    } else if (levelRole <= 45000) {
-        role = {
-            rank: 'Legend I',
-            name: 'Legend',
-            id: 1
-        }
-    } else if (levelRole <= 50000) {
-        role = {
-            rank: 'Legend II',
-            name: 'Legend',
-            id: 2
-        }
-    } else if (levelRole <= 55000) {
-        role = {
-            rank: 'Legend III',
-            name: 'Legend',
-            id: 3
-        }
-    } else if (levelRole <= 60000) {
-        role = {
-            rank: 'Legend IV',
-            name: 'Legend',
-            id: 4
-        }
-    } else if (levelRole <= 70000) {
-        role = {
-            rank: 'Mythic I',
-            name: 'Mythic',
-            id: 1
-        }
-    } else if (levelRole <= 80000) {
-        role = {
-            rank: 'Mythic II',
-            name: 'Mythic',
-            id: 2
-        }
-    } else if (levelRole <= 90000) {
-        role = {
-            rank: 'Mythic III',
-            name: 'Mythic',
-            id: 3
-        }
-    } else if (levelRole <= 100000) {
-        role = {
-            rank: 'Mythic IV',
-            name: 'Mythic',
-            id: 4
-        }
-    } else if (levelRole <= 120000) {
-        role = {
-            rank: 'Immortal I',
-            name: 'Immortal',
-            id: 1
-        }
-    } else if (levelRole <= 140000) {
-        role = {
-            rank: 'Immortal II',
-            name: 'Immortal',
-            id: 2
-        }
-    } else if (levelRole <= 160000) {
-        role = {
-            rank: 'Immortal III',
-            name: 'Immortal',
-            id: 3
-        }
-    } else if (levelRole <= 180000) {
-        role = {
-            rank: 'Immortal IV',
-            name: 'Immortal',
-            id: 4
-        }
-    } else if (levelRole <= 200000) {
-        role = {
-            rank: 'Celestial I',
-            name: 'Celestial',
-            id: 1
-        }
-    } else if (levelRole <= 220000) {
-        role = {
-            rank: 'Celestial II',
-            name: 'Celestial',
-            id: 2
-        }
-    } else if (levelRole <= 240000) {
-        role = {
-            rank: 'Celestial III',
-            name: 'Celestial',
-            id: 3
-        }
-    } else if (levelRole <= 260000) {
-        role = {
-            rank: 'Celestial IV',
-            name: 'Celestial',
-            id: 4
-        }
-    } else if (levelRole <= 280000) {
-        role = {
-            rank: 'Divine I',
-            name: 'Divine',
-            id: 1
-        }
-    } else if (levelRole <= 300000) {
-        role = {
-            rank: 'Divine II',
-            name: 'Divine',
-            id: 2
-        }
-    } else if (levelRole <= 320000) {
-        role = {
-            rank: 'Divine III',
-            name: 'Divine',
-            id: 3
-        }
-    } else if (levelRole <= 340000) {
-        role = {
-            rank: 'Divine IV',
-            name: 'Divine',
-            id: 4
-        }
-    } else if (levelRole <= 360000) {
-        role = {
-            rank: 'Titan I',
-            name: 'Titan',
-            id: 1
-        }
-    } else if (levelRole <= 380000) {
-        role = {
-            rank: 'Titan II',
-            name: 'Titan',
-            id: 2
-        }
-    } else if (levelRole <= 400000) {
-        role = {
-            rank: 'Titan III',
-            name: 'Titan',
-            id: 3
-        }
-    } else if (levelRole <= 420000) {
-        role = {
-            rank: 'Titan IV',
-            name: 'Titan',
-            id: 4
-        }
-    } else if (levelRole <= 440000) {
-        role = {
-            rank: 'Godlike I',
-            name: 'Godlike',
-            id: 1
-        }
-    } else if (levelRole <= 460000) {
-        role = {
-            rank: 'Godlike II',
-            name: 'Godlike',
-            id: 2
-        }
-    } else if (levelRole <= 480000) {
-        role = {
-            rank: 'Godlike III',
-            name: 'Godlike',
-            id: 3
-        }
-    } else if (levelRole <= 500000) {
-        role = {
-            rank: 'Godlike IV',
-            name: 'Godlike',
-            id: 4
-        }
-    } else if (levelRole <= 520000) {
-        role = {
-            rank: 'Omnipotent I',
-            name: 'Omnipotent',
-            id: 1
-        }
-    } else if (levelRole <= 540000) {
-        role = {
-            rank: 'Omnipotent II',
-            name: 'Omnipotent',
-            id: 2
-        }
-    } else if (levelRole <= 560000) {
-        role = {
-            rank: 'Omnipotent III',
-            name: 'Omnipotent',
-            id: 3
-        }
-    } else if (levelRole <= 580000) {
-        role = {
-            rank: 'Omnipotent IV',
-            name: 'Omnipotent',
-            id: 4
-        }
-    } else if (levelRole <= 600000) {
-        role = {
-            rank: 'Supreme I',
-            name: 'Supreme',
-            id: 1
-        }
-    } else if (levelRole <= 620000) {
-        role = {
-            rank: 'Supreme II',
-            name: 'Supreme',
-            id: 2
-        }
-    } else if (levelRole <= 640000) {
-        role = {
-            rank: 'Supreme III',
-            name: 'Supreme',
-            id: 3
-        }
-    } else if (levelRole <= 660000) {
-        role = {
-            rank: 'Supreme IV',
-            name: 'Supreme',
-            id: 4
-        }
-    } else if (levelRole <= 680000) {
-        role = {
-            rank: 'Eternal I',
-            name: 'Eternal',
-            id: 1
-        }
-    } else if (levelRole <= 700000) {
-        role = {
-            rank: 'Eternal II',
-            name: 'Eternal',
-            id: 2
-        }
-    } else if (levelRole <= 720000) {
-        role = {
-            rank: 'Eternal III',
-            name: 'Eternal',
-            id: 3
-        }
-    } else if (levelRole <= 740000) {
-        role = {
-            rank: 'Eternal IV',
-            name: 'Eternal',
-            id: 4
-        }
-    }
-    else if (levelRole <= 760000) {
-        role = {
-            rank: 'Transcendent I',
-            name: 'Transcendent',
-            id: 1
-        }
-    } else if (levelRole <= 780000) {
-        role = {
-            rank: 'Transcendent II',
-            name: 'Transcendent',
-            id: 2
-        }
-    } else if (levelRole <= 800000) {
-        role = {
-            rank: 'Transcendent III',
-            name: 'Transcendent',
-            id: 3
-        }
-    } else if (levelRole <= 820000) {
-        role = {
-            rank: 'Transcendent IV',
-            name: 'Transcendent',
-            id: 4
-        }
-    } else if (levelRole <= 840000) {
-        role = {
-            rank: 'Infinity I',
-            name: 'Infinity',
-            id: 1
-        }
-    } else if (levelRole <= 860000) {
-        role = {
-            rank: 'Infinity II',
-            name: 'Infinity',
-            id: 2
-        }
-    } else if (levelRole <= 880000) {
-        role = {
-            rank: 'Infinity III',
-            name: 'Infinity',
-            id: 3
-        }
-    } else if (levelRole <= 900000) {
-        role = {
-            rank: 'Infinity IV',
-            name: 'Infinity',
-            id: 4
-        }
-    } else if (levelRole <= 920000) {
-        role = {
-            rank: 'Cosmic I',
-            name: 'Cosmic',
-            id: 1
-        }
-    } else if (levelRole <= 940000) {
-        role = {
-            rank: 'Cosmic II',
-            name: 'Cosmic',
-            id: 2
-        }
-    } else if (levelRole <= 960000) {
-        role = {
-            rank: 'Cosmic III',
-            name: 'Cosmic',
-            id: 3
-        }
-    } else if (levelRole <= 980000) {
-        role = {
-            rank: 'Cosmic IV',
-            name: 'Cosmic',
-            id: 4
-        }
-    } else if (levelRole <= 1000000) {
-        role = {
-            rank: 'Galactic I',
-            name: 'Galactic',
-            id: 1
-        }
-    } else if (levelRole <= 1020000) {
-        role = {
-            rank: 'Galactic II',
-            name: 'Galactic',
-            id: 2
-        }
-    } else if (levelRole <= 1040000) {
-        role = {
-            rank: 'Galactic III',
-            name: 'Galactic',
-            id: 3
-        }
-    } else if (levelRole <= 1060000) {
-        role = {
-            rank: 'Galactic IV',
-            name: 'Galactic',
-            id: 4
-        }
-    } else if (levelRole <= 1080000) {
-        role = {
-            rank: 'Universal I',
-            name: 'Universal',
-            id: 1
-        }
-    } else if (levelRole <= 1100000) {
-        role = {
-            rank: 'Universal II',
-            name: 'Universal',
-            id: 2
-        }
-    } else if (levelRole <= 1120000) {
-        role = {
-            rank: 'Universal III',
-            name: 'Universal',
-            id: 3
-        }
-    } else if (levelRole <= 1140000) {
-        role = {
-            rank: 'Universal IV',
-            name: 'Universal',
-            id: 4
-        }
-    } else if (levelRole <= 1160000) {
-        role = {
-            rank: 'Multiversal I',
-            name: 'Multiversal',
-            id: 1
-        }
-    } else if (levelRole <= 1180000) {
-        role = {
-            rank: 'Multiversal II',
-            name: 'Multiversal',
-            id: 2
-        }
-    } else if (levelRole <= 1200000) {
-        role = {
-            rank: 'Multiversal III',
-            name: 'Multiversal',
-            id: 3
-        }
-    } else if (levelRole <= 1220000) {
-        role = {
-            rank: 'Multiversal IV',
-            name: 'Multiversal',
-            id: 4
-        }
-    } else if (levelRole <= 1240000) {
-        role = {
-            rank: 'Omniversal I',
-            name: 'Omniversal',
-            id: 1
-        }
-    } else if (levelRole <= 1260000) {
-        role = {
-            rank: 'Omniversal II',
-            name: 'Omniversal',
-            id: 2
-        }
-    } else if (levelRole <= 1280000) {
-        role = {
-            rank: 'Omniversal III',
-            name: 'Omniversal',
-            id: 3
-        }
-    } else if (levelRole <= 1300000) {
-        role = {
-            rank: 'Omniversal IV',
-            name: 'Omniversal',
-            id: 4
-        }
-    } else if (levelRole <= 1320000) {
-        role = {
-            rank: 'Absolute I',
-            name: 'Absolute',
-            id: 1
-        }
-    } else if (levelRole <= 1340000) {
-        role = {
-            rank: 'Absolute II',
-            name: 'Absolute',
-            id: 2
-        }
-    } else if (levelRole <= 1360000) {
-        role = {
-            rank: 'Absolute III',
-            name: 'Absolute',
-            id: 3
-        }
-    } else if (levelRole <= 1380000) {
-        role = {
-            rank: 'Absolute IV',
-            name: 'Absolute',
-            id: 4
-        }
-    } else if (levelRole <= 1400000) {
-        role = {
-            rank: 'Ultimate I',
-            name: 'Ultimate',
-            id: 1
-        }
-    } else if (levelRole <= 1420000) {
-        role = {
-            rank: 'Ultimate II',
-            name: 'Ultimate',
-            id: 2
-        }
-    } else if (levelRole <= 1440000) {
-        role = {
-            rank: 'Ultimate III',
-            name: 'Ultimate',
-            id: 3
-        }
-    } else if (levelRole <= 1460000) {
-        role = {
-            rank: 'Ultimate IV',
-            name: 'Ultimate',
-            id: 4
-        }
-    } else if (levelRole <= 1480000) {
-        role = {
-            rank: 'Supreme Alpha I',
-            name: 'Supreme Alpha',
-            id: 1
-        }
-    } else if (levelRole <= 1500000) {
-        role = {
-            rank: 'Supreme Alpha II',
-            name: 'Supreme Alpha',
-            id: 2
-        }
-    } else if (levelRole <= 1520000) {
-        role = {
-            rank: 'Supreme Alpha III',
-            name: 'Supreme Alpha',
-            id: 3
-        }
-    } else if (levelRole <= 1540000) {
-        role = {
-            rank: 'Supreme Alpha IV',
-            name: 'Supreme Alpha',
-            id: 4
-        }
-    } else if (levelRole <= 1560000) {
-        role = {
-            rank: 'Eternal Omega I',
-            name: 'Eternal Omega',
-            id: 1
-        }
-    } else if (levelRole <= 1580000) {
-        role = {
-            rank: 'Eternal Omega II',
-            name: 'Eternal Omega',
-            id: 2
-        }
-    } else if (levelRole <= 1600000) {
-        role = {
-            rank: 'Eternal Omega III',
-            name: 'Eternal Omega',
-            id: 3
-        }
-    } else if (levelRole <= 1620000) {
-        role = {
-            rank: 'Eternal Omega IV',
-            name: 'Eternal Omega',
-            id: 4
-        }
-    } else if (levelRole <= 1640000) {
-        role = {
-            rank: 'Immortal God I',
-            name: 'Immortal God',
-            id: 1
-        }
-    } else if (levelRole <= 1660000) {
-        role = {
-            rank: 'Immortal God II',
-            name: 'Immortal God',
-            id: 2
-        }
-    } else if (levelRole <= 1680000) {
-        role = {
-            rank: 'Immortal God III',
-            name: 'Immortal God',
-            id: 3
-        }
-    } else if (levelRole <= 1700000) {
-        role = {
-            rank: 'Immortal God IV',
-            name: 'Immortal God',
-            id: 4
-        }
-    } else if (levelRole <= 1720000) {
-        role = {
-            rank: 'Celestial Deity I',
-            name: 'Celestial Deity',
-            id: 1
-        }
-    } else if (levelRole <= 1740000) {
-        role = {
-            rank: 'Celestial Deity II',
-            name: 'Celestial Deity',
-            id: 2
-        }
-    } else if (levelRole <= 1760000) {
-        role = {
-            rank: 'Celestial Deity III',
-            name: 'Celestial Deity',
-            id: 3
-        }
-    } else if (levelRole <= 1780000) {
-        role = {
-            rank: 'Celestial Deity IV',
-            name: 'Celestial Deity',
-            id: 4
-        }
-    } else if (levelRole <= 1800000) {
-        role = {
-            rank: 'Divine Creator I',
-            name: 'Divine Creator',
-            id: 1
-        }
-    } else if (levelRole <= 1820000) {
-        role = {
-            rank: 'Divine Creator II',
-            name: 'Divine Creator',
-            id: 2
-        }
-    } else if (levelRole <= 1840000) {
-        role = {
-            rank: 'Divine Creator III',
-            name: 'Divine Creator',
-            id: 3
-        }
-    } else if (levelRole <= 1860000) {
-        role = {
-            rank: 'Divine Creator IV',
-            name: 'Divine Creator',
-            id: 4
-        }
-    } else if (levelRole <= 1880000) {
-        role = {
-            rank: 'Titan Overlord I',
-            name: 'Titan Overlord',
-            id: 1
-        }
-    } else if (levelRole <= 1900000) {
-        role = {
-            rank: 'Titan Overlord II',
-            name: 'Titan Overlord',
-            id: 2
-        }
-    } else if (levelRole <= 1920000) {
-        role = {
-            rank: 'Titan Overlord III',
-            name: 'Titan Overlord',
-            id: 3
-        }
-    } else if (levelRole <= 1940000) {
-        role = {
-            rank: 'Titan Overlord IV',
-            name: 'Titan Overlord',
-            id: 4
-        }
-    } else if (levelRole <= 1960000) {
-        role = {
-            rank: 'Godlike Emperor I',
-            name: 'Godlike Emperor',
-            id: 1
-        }
-    } else if (levelRole <= 1980000) {
-        role = {
-            rank: 'Godlike Emperor II',
-            name: 'Godlike Emperor',
-            id: 2
-        }
-    } else if (levelRole <= 2000000) {
-        role = {
-            rank: 'Godlike Emperor III',
-            name: 'Godlike Emperor',
-            id: 3
-        }
-    } else if (levelRole <= 2020000) {
-        role = {
-            rank: 'Godlike Emperor IV',
-            name: 'Godlike Emperor',
-            id: 4
-        }
-    } else if (levelRole <= 2040000) {
-        role = {
-            rank: 'Omnipotent King I',
-            name: 'Omnipotent King',
-            id: 1
-        }
-    } else if (levelRole <= 2060000) {
-        role = {
-            rank: 'Omnipotent King II',
-            name: 'Omnipotent King',
-            id: 2
-        }
-    } else if (levelRole <= 2080000) {
-        role = {
-            rank: 'Omnipotent King III',
-            name: 'Omnipotent King',
-            id: 3
-        }
-    } else if (levelRole <= 2100000) {
-        role = {
-            rank: 'Omnipotent King IV',
-            name: 'Omnipotent King',
-            id: 4
-        }
-    } else if (levelRole <= 2200000) {
-        role = {
-            rank: 'Supreme Legend I',
-            name: 'Supreme Legend',
-            id: 1
-        }
-    } else if (levelRole <= 2300000) {
-        role = {
-            rank: 'Supreme Legend II',
-            name: 'Supreme Legend',
-            id: 2
-        }
-    } else if (levelRole <= 2400000) {
-        role = {
-            rank: 'Supreme Legend III',
-            name: 'Supreme Legend',
-            id: 3
-        }
-    } else if (levelRole <= 2500000) {
-        role = {
-            rank: 'Supreme Legend IV',
-            name: 'Supreme Legend',
-            id: 4
-        }
-    } else if (levelRole <= 2600000) {
-        role = {
-            rank: 'Eternal Myth I',
-            name: 'Eternal Myth',
-            id: 1
-        }
-    } else if (levelRole <= 2700000) {
-        role = {
-            rank: 'Eternal Myth II',
-            name: 'Eternal Myth',
-            id: 2
-        }
-    } else if (levelRole <= 2800000) {
-        role = {
-            rank: 'Eternal Myth III',
-            name: 'Eternal Myth',
-            id: 3
-        }
-    } else if (levelRole <= 2900000) {
-        role = {
-            rank: 'Eternal Myth IV',
-            name: 'Eternal Myth',
-            id: 4
-        }
-    } else if (levelRole <= 3000000) {
-        role = {
-            rank: 'Immortal Phoenix I',
-            name: 'Immortal Phoenix',
-            id: 1
-        }
-    } else if (levelRole <= 3100000) {
-        role = {
-            rank: 'Immortal Phoenix II',
-            name: 'Immortal Phoenix',
-            id: 2
-        }
-    } else if (levelRole <= 3200000) {
-        role = {
-            rank: 'Immortal Phoenix III',
-            name: 'Immortal Phoenix',
-            id: 3
-        }
-    } else if (levelRole <= 3300000) {
-        role = {
-            rank: 'Immortal Phoenix IV',
-            name: 'Immortal Phoenix',
-            id: 4
-        }
-    } else if (levelRole <= 3400000) {
-        role = {
-            rank: 'Celestial Dragon I',
-            name: 'Celestial Dragon',
-            id: 1
-        }
-    } else if (levelRole <= 3500000) {
-        role = {
-            rank: 'Celestial Dragon II',
-            name: 'Celestial Dragon',
-            id: 2
-        }
-    } else if (levelRole <= 3600000) {
-        role = {
-            rank: 'Celestial Dragon III',
-            name: 'Celestial Dragon',
-            id: 3
-        }
-    } else if (levelRole <= 3700000) {
-        role = {
-            rank: 'Celestial Dragon IV',
-            name: 'Celestial Dragon',
-            id: 4
-        }
-    } else if (levelRole <= 3800000) {
-        role = {
-            rank: 'Divine Archon I',
-            name: 'Divine Archon',
-            id: 1
-        }
-    } else if (levelRole <= 3900000) {
-        role = {
-            rank: 'Divine Archon II',
-            name: 'Divine Archon',
-            id: 2
-        }
-    } else if (levelRole <= 4000000) {
-        role = {
-            rank: 'Divine Archon III',
-            name: 'Divine Archon',
-            id: 3
-        }
-    } else if (levelRole <= 4100000) {
-        role = {
-            rank: 'Divine Archon IV',
-            name: 'Divine Archon',
-            id: 4
-        }
-    } else if (levelRole <= 4200000) {
-        role = {
-            rank: 'Titan Prime I',
-            name: 'Titan Prime',
-            id: 1
-        }
-    } else if (levelRole <= 4300000) {
-        role = {
-            rank: 'Titan Prime II',
-            name: 'Titan Prime',
-            id: 2
-        }
-    } else if (levelRole <= 4400000) {
-        role = {
-            rank: 'Titan Prime III',
-            name: 'Titan Prime',
-            id: 3
-        }
-    } else if (levelRole <= 4500000) {
-        role = {
-            rank: 'Titan Prime IV',
-            name: 'Titan Prime',
-            id: 4
-        }
-    } else if (levelRole <= 4600000) {
-        role = {
-            rank: 'Godlike Sovereign I',
-            name: 'Godlike Sovereign',
-            id: 1
-        }
-    } else if (levelRole <= 4700000) {
-        role = {
-            rank: 'Godlike Sovereign II',
-            name: 'Godlike Sovereign',
-            id: 2
-        }
-    } else if (levelRole <= 4800000) {
-        role = {
-            rank: 'Godlike Sovereign III',
-            name: 'Godlike Sovereign',
-            id: 3
-        }
-    } else if (levelRole <= 4900000) {
-        role = {
-            rank: 'Godlike Sovereign IV',
-            name: 'Godlike Sovereign',
-            id: 4
-        }
-    } else if (levelRole <= 5000000) {
-        role = {
-            rank: 'Omnipotent Ascendant I',
-            name: 'Omnipotent Ascendant',
-            id: 1
-        }
-    } else if (levelRole <= 5100000) {
-        role = {
-            rank: 'Omnipotent Ascendant II',
-            name: 'Omnipotent Ascendant',
-            id: 2
-        }
-    } else if (levelRole <= 5200000) {
-        role = {
-            rank: 'Omnipotent Ascendant III',
-            name: 'Omnipotent Ascendant',
-            id: 3
-        }
-    } else if (levelRole <= 5300000) {
-        role = {
-            rank: 'Omnipotent Ascendant IV',
-            name: 'Omnipotent Ascendant',
-            id: 4
-        }
-    } else if (levelRole <= 5400000) {
-        role = {
-            rank: 'Supreme Paragon I',
-            name: 'Supreme Paragon',
-            id: 1
-        }
-    } else if (levelRole <= 5500000) {
-        role = {
-            rank: 'Supreme Paragon II',
-            name: 'Supreme Paragon',
-            id: 2
-        }
-    } else if (levelRole <= 5600000) {
-        role = {
-            rank: 'Supreme Paragon III',
-            name: 'Supreme Paragon',
-            id: 3
-        }
-    } else if (levelRole <= 5700000) {
-        role = {
-            rank: 'Supreme Paragon IV',
-            name: 'Supreme Paragon',
-            id: 4
-        }
-    } else if (levelRole <= 5800000) {
-        role = {
-            rank: 'Eternal Zenith I',
-            name: 'Eternal Zenith',
-            id: 1
-        }
-    } else if (levelRole <= 5900000) {
-        role = {
-            rank: 'Eternal Zenith II',
-            name: 'Eternal Zenith',
-            id: 2
-        }
-    } else if (levelRole <= 6000000) {
-        role = {
-            rank: 'Eternal Zenith III',
-            name: 'Eternal Zenith',
-            id: 3
-        }
-    } else if (levelRole <= 6100000) {
-        role = {
-            rank: 'Eternal Zenith IV',
-            name: 'Eternal Zenith',
-            id: 4
-        }
-    } else if (levelRole <= 6200000) {
-        role = {
-            rank: 'Immortal Apex I',
-            name: 'Immortal Apex',
-            id: 1
-        }
-    } else if (levelRole <= 6300000) {
-        role = {
-            rank: 'Immortal Apex II',
-            name: 'Immortal Apex',
-            id: 2
-        }
-    } else if (levelRole <= 6400000) {
-        role = {
-            rank: 'Immortal Apex III',
-            name: 'Immortal Apex',
-            id: 3
-        }
-    } else if (levelRole <= 6500000) {
-        role = {
-            rank: 'Immortal Apex IV',
-            name: 'Immortal Apex',
-            id: 4
-        }
-    } else if (levelRole <= 6600000) {
-        role = {
-            rank: 'Celestial Pinnacle I',
-            name: 'Celestial Pinnacle',
-            id: 1
-        }
-    } else if (levelRole <= 6700000) {
-        role = {
-            rank: 'Celestial Pinnacle II',
-            name: 'Celestial Pinnacle',
-            id: 2
-        }
-    } else if (levelRole <= 6800000) {
-        role = {
-            rank: 'Celestial Pinnacle III',
-            name: 'Celestial Pinnacle',
-            id: 3
-        }
-    } else if (levelRole <= 6900000) {
-        role = {
-            rank: 'Celestial Pinnacle IV',
-            name: 'Celestial Pinnacle',
-            id: 4
-        }
-    } else if (levelRole <= 7000000) {
-        role = {
-            rank: 'Divine Peak I',
-            name: 'Divine Peak',
-            id: 1
-        }
-    } else if (levelRole <= 7100000) {
-        role = {
-            rank: 'Divine Peak II',
-            name: 'Divine Peak',
-            id: 2
-        }
-    } else if (levelRole <= 7200000) {
-        role = {
-            rank: 'Divine Peak III',
-            name: 'Divine Peak',
-            id: 3
-        }
-    } else if (levelRole <= 7300000) {
-        role = {
-            rank: 'Divine Peak IV',
-            name: 'Divine Peak',
-            id: 4
-        }
-    } else if (levelRole <= 7400000) {
-        role = {
-            rank: 'Titan Summit I',
-            name: 'Titan Summit',
-            id: 1
-        }
-    } else if (levelRole <= 7500000) {
-        role = {
-            rank: 'Titan Summit II',
-            name: 'Titan Summit',
-            id: 2
-        }
-    } else if (levelRole <= 7600000) {
-        role = {
-            rank: 'Titan Summit III',
-            name: 'Titan Summit',
-            id: 3
-        }
-    } else if (levelRole <= 7700000) {
-        role = {
-            rank: 'Titan Summit IV',
-            name: 'Titan Summit',
-            id: 4
-        }
-    } else if (levelRole <= 7800000) {
-        role = {
-            rank: 'Godlike Apex I',
-            name: 'Godlike Apex',
-            id: 1
-        }
-    } else if (levelRole <= 7900000) {
-        role = {
-            rank: 'Godlike Apex II',
-            name: 'Godlike Apex',
-            id: 2
-        }
-    } else if (levelRole <= 8000000) {
-        role = {
-            rank: 'Godlike Apex III',
-            name: 'Godlike Apex',
-            id: 3
-        }
-    } else if (levelRole <= 8100000) {
-        role = {
-            rank: 'Godlike Apex IV',
-            name: 'Godlike Apex',
-            id: 4
-        }
-    } else if (levelRole <= 8200000) {
-        role = {
-            rank: 'Omnipotent Supreme I',
-            name: 'Omnipotent Supreme',
-            id: 1
-        }
-    } else if (levelRole <= 8300000) {
-        role = {
-            rank: 'Omnipotent Supreme II',
-            name: 'Omnipotent Supreme',
-            id: 2
-        }
-    } else if (levelRole <= 8400000) {
-        role = {
-            rank: 'Omnipotent Supreme III',
-            name: 'Omnipotent Supreme',
-            id: 3
-        }
-    } else if (levelRole <= 8500000) {
-        role = {
-            rank: 'Omnipotent Supreme IV',
-            name: 'Omnipotent Supreme',
-            id: 4
-        }
-    } else if (levelRole <= 8600000) {
-        role = {
-            rank: 'Supreme Emperor I',
-            name: 'Supreme Emperor',
-            id: 1
-        }
-    } else if (levelRole <= 8700000) {
-        role = {
-            rank: 'Supreme Emperor II',
-            name: 'Supreme Emperor',
-            id: 2
-        }
-    } else if (levelRole <= 8800000) {
-        role = {
-            rank: 'Supreme Emperor III',
-            name: 'Supreme Emperor',
-            id: 3
-        }
-    } else if (levelRole <= 8900000) {
-        role = {
-            rank: 'Supreme Emperor IV',
-            name: 'Supreme Emperor',
-            id: 4
-        }
-    } else if (levelRole <= 9000000) {
-        role = {
-            rank: 'Eternal Overlord I',
-            name: 'Eternal Overlord',
-            id: 1
-        }
-    } else if (levelRole <= 9100000) {
-        role = {
-            rank: 'Eternal Overlord II',
-            name: 'Eternal Overlord',
-            id: 2
-        }
-    } else if (levelRole <= 9200000) {
-        role = {
-            rank: 'Eternal Overlord III',
-            name: 'Eternal Overlord',
-            id: 3
-        }
-    } else if (levelRole <= 9300000) {
-        role = {
-            rank: 'Eternal Overlord IV',
-            name: 'Eternal Overlord',
-            id: 4
-        }
-    } else if (levelRole <= 9400000) {
-        role = {
-            rank: 'Immortal Monarch I',
-            name: 'Immortal Monarch',
-            id: 1
-        }
-    } else if (levelRole <= 9500000) {
-        role = {
-            rank: 'Immortal Monarch II',
-            name: 'Immortal Monarch',
-            id: 2
-        }
-    } else if (levelRole <= 9600000) {
-        role = {
-            rank: 'Immortal Monarch III',
-            name: 'Immortal Monarch',
-            id: 3
-        }
-    } else if (levelRole <= 9700000) {
-        role = {
-            rank: 'Immortal Monarch IV',
-            name: 'Immortal Monarch',
-            id: 4
-        }
-    } else if (levelRole <= 9800000) {
-        role = {
-            rank: 'Celestial King I',
-            name: 'Celestial King',
-            id: 1
-        }
-    } else if (levelRole <= 9900000) {
-        role = {
-            rank: 'Celestial King II',
-            name: 'Celestial King',
-            id: 2
-        }
-    } else if (levelRole <= 10000000) {
-        role = {
-            rank: 'Celestial King III',
-            name: 'Celestial King',
-            id: 3
-        }
-    } else if (levelRole <= 10100000) {
-        role = {
-            rank: 'Celestial King IV',
-            name: 'Celestial King',
-            id: 4
-        }
-    } else if (levelRole <= 10200000) {
-        role = {
-            rank: 'Divine God I',
-            name: 'Divine God',
-            id: 1
-        }
-    } else if (levelRole <= 10300000) {
-        role = {
-            rank: 'Divine God II',
-            name: 'Divine God',
-            id: 2
-        }
-    } else if (levelRole <= 10400000) {
-        role = {
-            rank: 'Divine God III',
-            name: 'Divine God',
-            id: 3
-        }
-    } else if (levelRole <= 10500000) {
-        role = {
-            rank: 'Divine God IV',
-            name: 'Divine God',
-            id: 4
-        }
-    } else if (levelRole <= 10600000) {
-        role = {
-            rank: 'Titan God I',
-            name: 'Titan God',
-            id: 1
-        }
-    } else if (levelRole <= 10700000) {
-        role = {
-            rank: 'Titan God II',
-            name: 'Titan God',
-            id: 2
-        }
-    } else if (levelRole <= 10800000) {
-        role = {
-            rank: 'Titan God III',
-            name: 'Titan God',
-            id: 3
-        }
-    } else if (levelRole <= 10900000) {
-        role = {
-            rank: 'Titan God IV',
-            name: 'Titan God',
-            id: 4
-        }
-    } else if (levelRole <= 11000000) {
-        role = {
-            rank: 'Godlike Deity I',
-            name: 'Godlike Deity',
-            id: 1
-        }
-    } else if (levelRole <= 11100000) {
-        role = {
-            rank: 'Godlike Deity II',
-            name: 'Godlike Deity',
-            id: 2
-        }
-    } else if (levelRole <= 11200000) {
-        role = {
-            rank: 'Godlike Deity III',
-            name: 'Godlike Deity',
-            id: 3
-        }
-    } else if (levelRole <= 11300000) {
-        role = {
-            rank: 'Godlike Deity IV',
-            name: 'Godlike Deity',
-            id: 4
-        }
-    } else if (levelRole <= 11400000) {
-        role = {
-            rank: 'Omnipotent Creator I',
-            name: 'Omnipotent Creator',
-            id: 1
-        }
-    } else if (levelRole <= 11500000) {
-        role = {
-            rank: 'Omnipotent Creator II',
-            name: 'Omnipotent Creator',
-            id: 2
-        }
-    } else if (levelRole <= 11600000) {
-        role = {
-            rank: 'Omnipotent Creator III',
-            name: 'Omnipotent Creator',
-            id: 3
-        }
-    } else if (levelRole <= 11700000) {
-        role = {
-            rank: 'Omnipotent Creator IV',
-            name: 'Omnipotent Creator',
-            id: 4
-        }
-    } else if (levelRole <= 11800000) {
-        role = {
-            rank: 'Supreme Ultimate I',
-            name: 'Supreme Ultimate',
-            id: 1
-        }
-    } else if (levelRole <= 11900000) {
-        role = {
-            rank: 'Supreme Ultimate II',
-            name: 'Supreme Ultimate',
-            id: 2
-        }
-    } else if (levelRole <= 12000000) {
-        role = {
-            rank: 'Supreme Ultimate III',
-            name: 'Supreme Ultimate',
-            id: 3
-        }
-    } else if (levelRole <= 12100000) {
-        role = {
-            rank: 'Supreme Ultimate IV',
-            name: 'Supreme Ultimate',
-            id: 4
-        }
-    } else if (levelRole <= 12200000) {
-        role = {
-            rank: 'Eternal Infinity I',
-            name: 'Eternal Infinity',
-            id: 1
-        }
-    } else if (levelRole <= 12300000) {
-        role = {
-            rank: 'Eternal Infinity II',
-            name: 'Eternal Infinity',
-            id: 2
-        }
-    } else if (levelRole <= 12400000) {
-        role = {
-            rank: 'Eternal Infinity III',
-            name: 'Eternal Infinity',
-            id: 3
-        }
-    } else if (levelRole <= 12500000) {
-        role = {
-            rank: 'Eternal Infinity IV',
-            name: 'Eternal Infinity',
-            id: 4
-        }
-    } else if (levelRole <= 12600000) {
-        role = {
-            rank: 'Immortal Universe I',
-            name: 'Immortal Universe',
-            id: 1
-        }
-    } else if (levelRole <= 12700000) {
-        role = {
-            rank: 'Immortal Universe II',
-            name: 'Immortal Universe',
-            id: 2
-        }
-    } else if (levelRole <= 12800000) {
-        role = {
-            rank: 'Immortal Universe III',
-            name: 'Immortal Universe',
-            id: 3
-        }
-    } else if (levelRole <= 12900000) {
-        role = {
-            rank: 'Immortal Universe IV',
-            name: 'Immortal Universe',
-            id: 4
-        }
-    } else if (levelRole <= 13000000) {
-        role = {
-            rank: 'Celestial Multiverse I',
-            name: 'Celestial Multiverse',
-            id: 1
-        }
-    } else if (levelRole <= 13100000) {
-        role = {
-            rank: 'Celestial Multiverse II',
-            name: 'Celestial Multiverse',
-            id: 2
-        }
-    } else if (levelRole <= 13200000) {
-        role = {
-            rank: 'Celestial Multiverse III',
-            name: 'Celestial Multiverse',
-            id: 3
-        }
-    } else if (levelRole <= 13300000) {
-        role = {
-            rank: 'Celestial Multiverse IV',
-            name: 'Celestial Multiverse',
-            id: 4
-        }
-    } else if (levelRole <= 13400000) {
-        role = {
-            rank: 'Divine Omniverse I',
-            name: 'Divine Omniverse',
-            id: 1
-        }
-    } else if (levelRole <= 13500000) {
-        role = {
-            rank: 'Divine Omniverse II',
-            name: 'Divine Omniverse',
-            id: 2
-        }
-    } else if (levelRole <= 13600000) {
-        role = {
-            rank: 'Divine Omniverse III',
-            name: 'Divine Omniverse',
-            id: 3
-        }
-    } else if (levelRole <= 13700000) {
-        role = {
-            rank: 'Divine Omniverse IV',
-            name: 'Divine Omniverse',
-            id: 4
-        }
-    } else if (levelRole <= 13800000) {
-        role = {
-            rank: 'Titan Absolute I',
-            name: 'Titan Absolute',
-            id: 1
-        }
-    } else if (levelRole <= 13900000) {
-        role = {
-            rank: 'Titan Absolute II',
-            name: 'Titan Absolute',
-            id: 2
-        }
-    } else if (levelRole <= 14000000) {
-        role = {
-            rank: 'Titan Absolute III',
-            name: 'Titan Absolute',
-            id: 3
-        }
-    } else if (levelRole <= 14100000) {
-        role = {
-            rank: 'Titan Absolute IV',
-            name: 'Titan Absolute',
-            id: 4
-        }
-    } else if (levelRole <= 14200000) {
-        role = {
-            rank: 'Godlike Supreme I',
-            name: 'Godlike Supreme',
-            id: 1
-        }
-    } else if (levelRole <= 14300000) {
-        role = {
-            rank: 'Godlike Supreme II',
-            name: 'Godlike Supreme',
-            id: 2
-        }
-    } else if (levelRole <= 14400000) {
-        role = {
-            rank: 'Godlike Supreme III',
-            name: 'Godlike Supreme',
-            id: 3
-        }
-    } else if (levelRole <= 14500000) {
-        role = {
-            rank: 'Godlike Supreme IV',
-            name: 'Godlike Supreme',
-            id: 4
-        }
-    } else if (levelRole <= 15000000) {
-        role = {
-            rank: '✨ ULTIMATE LEGEND ✨',
-            name: 'Ultimate Legend',
-            id: 999
-        }
-    } else {
-        role = {
-            rank: '🏆 SUPREME GOD OF THE UNIVERSE 🏆',
-            name: 'Supreme God',
-            id: 9999
-        }
-    }
-    
-    return role
-}
+
+        
+        //game 
+       	let chess = db.game.chess
      
 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+if (userdb.afkTime > 0 && userdb.afkTime !== -1) {
+    if (userdb.afkTime > Date.now()) {
+        userdb.afkTime = -1
+        userdb.afkReason = ''
+    } else {
+        const afkDuration = Math.abs(Date.now() - userdb.afkTime)
+        
+        if (afkDuration < 86400000) {
+            m.reply(
+                `👋 Selamat datang kembali\n` +
+                `🕒 AFK selama: ${formatDuration(afkDuration)}`
+            )
+        } else {
+            m.reply(`👋 Selamat datang kembali`)
+        }
+        
+        userdb.afkTime = -1
+        userdb.afkReason = ''
+    }
+}
+
+if (m.mentionedJid?.length) {
+    for (const jid of m.mentionedJid) {
+        const target = global.db.users[jid]
+        if (target && target.afkTime > 0 && target.afkTime <= Date.now()) {
+            const afkDuration = Date.now() - target.afkTime
+            const durationText = formatDuration(afkDuration)
+            
+            m.reply(
+                `😴 Jangan ganggu dulu\n` +
+                `👤 @${jid.split('@')[0]} sedang AFK\n` +
+                `📌 Alasan: ${target.afkReason || 'Tanpa alasan'}\n` +
+                `🕒 Sejak: ${durationText}`
+            )
+        }
+    }
+}
+
+if (m.quoted?.sender) {
+    const jid = m.quoted.sender
+    const target = global.db.users[jid]
+    
+    if (target && target.afkTime > 0 && target.afkTime <= Date.now()) {
+        const afkDuration = Date.now() - target.afkTime
+        const durationText = formatDuration(afkDuration)
+        
+        m.reply(
+            `😴 Jangan ganggu dulu\n` +
+            `👤 @${jid.split('@')[0]} sedang AFK\n` +
+            `📌 Alasan: ${target.afkReason || 'Tanpa alasan'}\n` +
+            `🕒 Sejak: ${durationText}`
+        )
+    }
+}        
        if (db.users[m.sender].exp > 500) {
     let background = "https://cdn.asuma.my.id/iudi983.jpg";
     let avatar = ppuser;
@@ -2243,205 +1040,397 @@ Hebat Levelmu Naik
         });
     }
 }
+        
+        setInterval(async () => {
+  if (!Array.isArray(global.db.premium) || global.db.premium.length === 0) return
+  const now = Date.now()
+  for (let prem of global.db.premium) {
+    if (prem.notifH1 === undefined) prem.notifH1 = false
+    if (prem.notifExpired === undefined) prem.notifExpired = false
+    if (prem.expired <= now && !prem.notifExpired) {
+      prem.notifExpired = true
+
+      if (global.db.users[prem.jid]) {
+        global.db.users[prem.jid].premium = false
+      }
+
+      try {
+        await Ditss.sendMessage(prem.jid, {
+          text: `❌ *Premium Expired*\n\nPremium kamu telah berakhir.\nTerima kasih sudah berlangganan 🙏`
+        })
+      } catch (e) {}
+
+      console.log(`❌ Premium expired: ${prem.jid}`)
+    }
+    if (
+      prem.expired > now &&
+      prem.expired <= now + 24 * 60 * 60 * 1000 &&
+      !prem.notifH1
+    ) {
+      prem.notifH1 = true
+
+      try {
+        await Ditss.sendMessage(prem.jid, {
+          text: `⚠️ *Premium Hampir Habis*\n\nPremium kamu akan habis dalam *1 hari*.\nSegera perpanjang ya.`
+        })
+      } catch (e) {}
+
+      console.log(`⚠️ Premium H-1: ${prem.jid}`)
+    }
+  }
+  global.db.premium = global.db.premium.filter(p => p.expired > now)
+
+}, 10000)
+        
+       // auto gempa
+        setInterval(async () => {
+  try {
+    let aktif = false
+    for (let chat in db.groups) {
+      if (db.groups[chat]?.auto?.gempa?.enable) {
+        aktif = true
+        break
+      }
+    }
+    if (!aktif) return
+
+    let res = await axios.post('https://api.asuma.my.id/v1/tools/cekgempa')
+    let data = await res.json()
+    if (!data.status) return
+
+    let gempa = data.result
+
+    for (let chat in db.groups) {
+      let g = db.groups[chat]
+      if (!g?.auto?.gempa?.enable) continue
+      if (g.auto.gempa.data === gempa.waktu) continue
+      g.auto.gempa.data = gempa.waktu
+
+      await Ditss.sendMessage(chat, {
+        image: { url: gempa.peta },
+        caption:
+`⚠️ *GEMPA BARU*
+
+📍 ${gempa.lokasi}
+⏰ ${gempa.waktu}
+📏 ${gempa.magnitude} SR
+🔻 ${gempa.kedalaman}
+🌊 ${gempa.potensi}`
+      })
+    }
+  } catch (e) {
+    //console.log(".")
+  }
+}, 60_000)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        		// Chess
+		if ((!isCmd || isCreator) && (m.sender in chess)) {
+			const game = chess[m.sender];
+			if (m.quoted && game.id == m.quoted.id && game.turn == m.sender && game.botMode) {
+				if (!(game instanceof Chess)) {
+					chess[m.sender] = Object.assign(new Chess(game.fen), game);
+				}
+				if (game.isCheckmate() || game.isDraw() || game.isGameOver()) {
+					const status = game.isCheckmate() ? 'Checkmate' : game.isDraw() ? 'Draw' : 'Game Over';
+					delete chess[m.sender];
+					return m.reply(`♟Game ${status}\nPermainan dihentikan`);
+				}
+				const [from, to] = budy.toLowerCase().split(' ');
+				if (!from || !to || from.length !== 2 || to.length !== 2) return m.reply('Format salah! Gunakan: e2 e4');
+				try {
+					game.move({ from, to });
+				} catch (e) {
+					return m.reply('Langkah Tidak Valid!')
+				}
+				
+				if (game.isGameOver()) {
+					delete chess[m.sender];
+					return m.reply(`♟Permainan Selesai\nPemenang: @${m.sender.split('@')[0]}`);
+				}
+				const moves = game.moves({ verbose: true });
+				const botMove = moves[Math.floor(Math.random() * moves.length)];
+				game.move(botMove);
+				game._fen = game.fen();
+				game.time = Date.now();
+				
+				if (game.isGameOver()) {
+					delete chess[m.sender];
+					return m.reply(`♟Permainan Selesai\nPemenang: BOT`);
+				}
+				const encodedFen = encodeURI(game._fen);
+				const boardUrls = [`https://www.chess.com/dynboard?fen=${encodedFen}&size=3&coordinates=inside`,`https://www.chess.com/dynboard?fen=${encodedFen}&board=graffiti&piece=graffiti&size=3&coordinates=inside`,`https://chessboardimage.com/${encodedFen}.png`,`https://backscattering.de/web-boardimage/board.png?fen=${encodedFen}&coordinates=true&size=765`,`https://fen2image.chessvision.ai/${encodedFen}/`];
+				for (let url of boardUrls) {
+					try {
+						const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+						let { key } = await m.reply({ image: data, caption: `♟️CHESS GAME (vs BOT)\n\nLangkahmu: ${from} → ${to}\nLangkah bot: ${botMove.from} → ${botMove.to}\n\nGiliranmu berikutnya!\nExample: e2 e4`, mentions: [m.sender] });
+						game.id = key.id;
+						break;
+					} catch (e) {}
+				}
+			} else if (game.time && (Date.now() - game.time >= 3600000)) {
+				delete chess[m.sender];
+				return m.reply(`♟Waktu Habis!\nPermainan dihentikan`);
+			}
+		}
+		if (m.isGroup && (!isCmd || isCreator) && (m.chat in chess)) {
+			if (m.quoted && chess[m.chat].id == m.quoted.id && [chess[m.chat].player1, chess[m.chat].player2].includes(m.sender)) {
+				if (!(chess[m.chat] instanceof Chess)) {
+					chess[m.chat] = Object.assign(new Chess(chess[m.chat].fen), chess[m.chat]);
+				}
+				if (chess[m.chat].isCheckmate() || chess[m.chat].isDraw() || chess[m.chat].isGameOver()) {
+					const status = chess[m.chat].isCheckmate() ? 'Checkmate' : chess[m.chat].isDraw() ? 'Draw' : 'Game Over';
+					delete chess[m.chat];
+					return m.reply(`♟Game ${status}\nPermainan dihentikan`);
+				}
+				const [from, to] = budy.toLowerCase().split(' ');
+				if (!from || !to || from.length !== 2 || to.length !== 2) return m.reply('Format salah! Gunakan format seperti: e2 e4');
+				if ([chess[m.chat].player1, chess[m.chat].player2].includes(m.sender) && chess[m.chat].turn === m.sender) {
+					try {
+						chess[m.chat].move({ from, to });
+					} catch (e) {
+						return m.reply('Langkah Tidak Valid!')
+					}
+					chess[m.chat].time = Date.now();
+					chess[m.chat]._fen = chess[m.chat].fen();
+					const isPlayer2 = chess[m.chat].player2 === m.sender
+					const nextPlayer = isPlayer2 ? chess[m.chat].player1 : chess[m.chat].player2;
+					const encodedFen = encodeURI(chess[m.chat]._fen);
+					const boardUrls = [`https://www.chess.com/dynboard?fen=${encodedFen}&size=3&coordinates=inside${!isPlayer2 ? '&flip=true' : ''}`,`https://www.chess.com/dynboard?fen=${encodedFen}&board=graffiti&piece=graffiti&size=3&coordinates=inside${!isPlayer2 ? '&flip=true' : ''}`,`https://chessboardimage.com/${encodedFen}${!isPlayer2 ? '-flip' : ''}.png`,`https://backscattering.de/web-boardimage/board.png?fen=${encodedFen}&coordinates=true&size=765${!isPlayer2 ? '&orientation=black' : ''}`,`https://fen2image.chessvision.ai/${encodedFen}/${!isPlayer2 ? '?pov=black' : ''}`];
+					for (let url of boardUrls) {
+						try {
+							const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+							let { key } = await m.reply({ image: data, caption: `♟️CHESS GAME\n\nGiliran: @${nextPlayer.split('@')[0]}\n\nReply Pesan Ini untuk lanjut bermain!\nExample: from to -> b1 c3`, mentions: [nextPlayer] });
+							chess[m.chat].turn = nextPlayer
+							chess[m.chat].id = key.id;
+							break;
+						} catch (e) {}
+					}
+				}
+			} else if (chess[m.chat].time && (Date.now() - chess[m.chat].time >= 3600000)) {
+				delete chess[m.chat]
+				return m.reply(`♟Waktu Habis!\nPermainan dihentikan`)
+			}
+		}
 
         // ===================== [TEBAK KALIMAT] HANDLER =====================
 if (db.game.tebakkalimat?.[m.chat] && !isCmd) {
-  const game = db.game.tebakkalimat[m.chat];
-  const jawaban = game.jawaban.toLowerCase().replace(/\s+/g, ' ').trim();
-  const userJawab = m.text.toLowerCase().trim().replace(/\s+/g, ' ').trim();
+  const game = db.game.tebakkalimat[m.chat]
+  const jawaban = game.jawaban.toLowerCase().replace(/\s+/g, ' ').trim()
+  const userJawab = m.text.toLowerCase().trim().replace(/\s+/g, ' ').trim()
   
-  const waktuJawab = Date.now() - game.startTime;
-  const detik = Math.floor(waktuJawab / 1000);
+  const waktuJawab = Date.now() - game.startTime
+  const detik = Math.floor(waktuJawab / 1000)
   
   if (Date.now() > game.timeout) {
-    await Ditss.sendMessage(
-  m.chat,
-  {
-    text: `⏰ *WAKTU HABIS!*\n\nJawaban: *${game.jawaban}*`,
-    footer: "Powered By Asuma",
-    headerType: 1,
-    buttons: [
-    {
-      buttonId: `.${randomGame.cmd}`,
+    await Ditss.sendMessage(m.chat, {
+      text: `⏰ *WAKTU HABIS!*\n\nJawaban: *${game.jawaban}*`,
+      footer: "Powered By Asuma",
+      headerType: 1,
+      buttons: [{
+        buttonId: `.${randomGame.cmd}`,
         buttonText: { displayText: randomGame.name },
-          type: 1
-          }
-    ]
-  },
-  { quoted: m }
-)
-    delete db.game.tebakkalimat[m.chat];
-    return;
+        type: 1
+      }]
+    }, { quoted: m })
+    delete db.game.tebakkalimat[m.chat]
+    return
   }
   
   if (['nyerah', 'skip', 'menyerah', 'gak tau', 'gatau', 'pasrah', 'stop', 'quit'].includes(userJawab)) {
-    await m.reply(`🏳️ *KAMU MENYERAH!*\n\nJawaban: *${game.jawaban}*`);
-    delete db.game.tebakkalimat[m.chat];
-    return;
+    await m.reply(`🏳️ *KAMU MENYERAH!*\n\nJawaban: *${game.jawaban}*`)
+    delete db.game.tebakkalimat[m.chat]
+    return
   }
   
   if (['bantuan', 'petunjuk', 'help', 'hint', 'clue'].includes(userJawab)) {
     try {
       await Ditss.sendMessage(m.sender, {
         text: `💡 *HINT TEBAK KALIMAT*\n\nKalimat: ${game.soal}\n\n_Hint ini rahasia ya! Jangan kasih tau yang lain_`
-      });
-      await m.reply(`📩 *Hint sudah dikirim ke chat pribadimu!*\nCek DM dari bot ya!`);
+      })
+      await m.reply(`📩 *Hint sudah dikirim ke chat pribadimu!*\nCek DM dari bot ya!`)
     } catch (err) {
-      await m.reply(`❌ *Gagal mengirim hint ke DM*\n\nPastikan kamu sudah memulai chat dengan bot!`);
+      await m.reply(`❌ *Gagal mengirim hint ke DM*\n\nPastikan kamu sudah memulai chat dengan bot!`)
     }
-    return;
+    return
   }
   
   if (userJawab === jawaban) {
-    // PASTIKAN USER SELALU ADA DENGAN STRUKTUR LENGKAP
-    if (!db.users[m.sender]) db.users[m.sender] = {};
-    
-    const user = db.users[m.sender];
-    const difficulty = game.difficulty || 'medium';
-    
-    // INISIALISASI SEMUA FIELD YANG DIBUTUHKAN
-    if (!user.name) user.name = m.pushName || 'Unknown';
-    if (!user.saldo) user.saldo = 0;
-    if (!user.rank) user.rank = 0;
-    if (!user.tebakkalimat_win) user.tebakkalimat_win = 0;
-    if (!user.tebakkalimat_total) user.tebakkalimat_total = 0;
-    if (!user.tebakkalimat_wrong) user.tebakkalimat_wrong = 0;
-    if (!user.tebakkalimat_best_time) user.tebakkalimat_best_time = Infinity;
-    if (!user.tebakkalimat_lastwin) user.tebakkalimat_lastwin = 0;
-    if (!user.tebakkalimat_last_difficulty) user.tebakkalimat_last_difficulty = '';
-    if (!user.tebakkalimat_top) user.tebakkalimat_top = false;
-    if (!user.tebakkalimat_top_rank) user.tebakkalimat_top_rank = 0;
-    
-    // INISIALISASI STATS JIKA BELUM ADA
-    if (!user.tebakkalimat_stats) {
-      user.tebakkalimat_stats = {
-        easy: { win: 0, total: 0, waktu: [] },
-        medium: { win: 0, total: 0, waktu: [] },
-        hard: { win: 0, total: 0, waktu: [] }
-      };
+    if (!db.users[m.sender]) {
+      db.users[m.sender] = {
+        name: m.pushName || 'Unknown',
+        saldo: 0,
+        rank: 0,
+        game: {}
+      }
     }
     
-    // PASTIKAN SETIAP DIFFICULTY ADA
-    ['easy', 'medium', 'hard'].forEach(diff => {
-      if (!user.tebakkalimat_stats[diff]) {
-        user.tebakkalimat_stats[diff] = { win: 0, total: 0, waktu: [] };
-      }
-      if (!user.tebakkalimat_stats[diff].waktu) {
-        user.tebakkalimat_stats[diff].waktu = [];
-      }
-    });
+    const user = db.users[m.sender]
+    const difficulty = game.difficulty || 'medium'
     
-    // INISIALISASI LIMIT JIKA BELUM ADA
-    if (!user.tebakkalimat_limit) {
-      user.tebakkalimat_limit = {
-        easy: 10,
-        medium: 5,
-        hard: 3
-      };
+    if (!user.game) user.game = {}
+    if (!user.game.tebakkalimat) {
+      user.game.tebakkalimat = {
+        win: 0,
+        total: 0,
+        wrong: 0,
+        best_time: Infinity,
+        last_win: 0,
+        last_difficulty: '',
+        top: false,
+        top_rank: 0,
+        cooldown: 0,
+        stats: {
+          easy: { win: 0, total: 0, waktu: [] },
+          medium: { win: 0, total: 0, waktu: [] },
+          hard: { win: 0, total: 0, waktu: [] }
+        },
+        limit: {
+          easy: 10,
+          medium: 5,
+          hard: 3
+        }
+      }
     }
     
-    user.tebakkalimat_win++;
-    user.tebakkalimat_total++;
-    user.tebakkalimat_lastwin = Date.now();
-    user.tebakkalimat_last_difficulty = difficulty;
+    const tebak = user.game.tebakkalimat
     
-    const baseRewards = { 'easy': 200, 'medium': 300, 'hard': 500 };
-    const waktuMaksimal = { 'easy': 90, 'medium': 60, 'hard': 30 };
+    if (!tebak.stats.easy) tebak.stats.easy = { win: 0, total: 0, waktu: [] }
+    if (!tebak.stats.medium) tebak.stats.medium = { win: 0, total: 0, waktu: [] }
+    if (!tebak.stats.hard) tebak.stats.hard = { win: 0, total: 0, waktu: [] }
     
-    let waktuBonus = 0;
+    tebak.win++
+    tebak.total++
+    tebak.last_win = Date.now()
+    tebak.last_difficulty = difficulty
+    
+    const baseRewards = { 'easy': 200, 'medium': 300, 'hard': 500 }
+    const waktuMaksimal = { 'easy': 90, 'medium': 60, 'hard': 30 }
+    
+    let waktuBonus = 0
     if (detik <= waktuMaksimal[difficulty]) {
-      waktuBonus = Math.round(baseRewards[difficulty] * 0.5);
+      waktuBonus = Math.round(baseRewards[difficulty] * 0.5)
     }
     
-    const totalReward = baseRewards[difficulty] + waktuBonus;
-    const rankBonus = Math.floor(Math.random() * 50) + 1;
+    const totalReward = baseRewards[difficulty] + waktuBonus
+    const rankBonus = Math.floor(Math.random() * 50) + 1
     
-    user.saldo += totalReward;
-    user.rank += rankBonus;
+    user.saldo += totalReward
+    user.rank += rankBonus
     
-    user.tebakkalimat_stats[difficulty].win++;
-    user.tebakkalimat_stats[difficulty].total++;
-    user.tebakkalimat_stats[difficulty].waktu.push(detik);
+    tebak.stats[difficulty].win++
+    tebak.stats[difficulty].total++
+    tebak.stats[difficulty].waktu.push(detik)
     
-    if (detik < user.tebakkalimat_best_time) {
-      user.tebakkalimat_best_time = detik;
+    if (detik < tebak.best_time) {
+      tebak.best_time = detik
     }
     
-    const displayName = user.name !== 'Unknown' ? user.name : m.sender.split('@')[0];
+    const displayName = user.name !== 'Unknown' ? user.name : m.sender.split('@')[0]
     
-    if (!db.game.top_notif) db.game.top_notif = {};
+    if (!db.game.top_notif) db.game.top_notif = {}
     if (!db.game.tebakkalimat_ranking) {
-      db.game.tebakkalimat_ranking = { top1: null, top2: null };
+      db.game.tebakkalimat_ranking = { top1: null, top2: null }
     }
     
-    const oldTop1 = db.game.tebakkalimat_ranking.top1;
-    const oldTop2 = db.game.tebakkalimat_ranking.top2;
+    const oldTop1 = db.game.tebakkalimat_ranking.top1
     
-    const allUsers = [];
-    let usersTebakKalimat = await getAllUsers()
+    const allUsers = []
+    const usersTebakKalimat = await getAllUsers()
+    
     for (let jid in usersTebakKalimat) {
-      const u = db.users[jid];
-      if (u && u.tebakkalimat_win > 0) {
+      const u = usersTebakKalimat[jid]
+      if (u && u.game && u.game.tebakkalimat && u.game.tebakkalimat.win > 0) {
         allUsers.push({
           jid,
-          wins: u.tebakkalimat_win || 0,
-          lastWin: u.tebakkalimat_lastwin || 0,
-          name: u.name && u.name !== 'Unknown' ? u.name : jid.split('@')[0]
-        });
+          wins: u.game.tebakkalimat.win || 0,
+          lastWin: u.game.tebakkalimat.last_win || 0,
+          name: (u.name && u.name !== 'Unknown') ? u.name : jid.split('@')[0]
+        })
       }
     }
     
     allUsers.sort((a, b) => {
-      if (b.wins !== a.wins) return b.wins - a.wins;
-      return b.lastWin - a.lastWin;
-    });
+      if (b.wins !== a.wins) return b.wins - a.wins
+      return b.lastWin - a.lastWin
+    })
     
     allUsers.forEach((u, index) => {
-      const userData = db.users[u.jid];
-      if (userData) {
-        userData.tebakkalimat_top = (index === 0);
-        userData.tebakkalimat_top_rank = index + 1;
+      const userData = usersTebakKalimat[u.jid]
+      if (userData && userData.game && userData.game.tebakkalimat) {
+        userData.game.tebakkalimat.top = (index === 0)
+        userData.game.tebakkalimat.top_rank = index + 1
       }
-    });
+    })
     
-    const userWins = user.tebakkalimat_win;
-    const currentRank = allUsers.findIndex(u => u.jid === m.sender) + 1;
-    const isTop1Now = currentRank === 1;
+    const userWins = tebak.win
+    const currentRank = allUsers.findIndex(u => u.jid === m.sender) + 1
+    const isTop1Now = currentRank === 1
     
-    let isNewTop1 = false;
-    let top2User = null;
+    let isNewTop1 = false
     
     if (allUsers.length > 0) {
-      db.game.tebakkalimat_ranking.top1 = allUsers[0].jid;
+      db.game.tebakkalimat_ranking.top1 = allUsers[0].jid
       if (allUsers.length > 1) {
-        db.game.tebakkalimat_ranking.top2 = allUsers[1].jid;
-        top2User = {
-          jid: allUsers[1].jid,
-          name: allUsers[1].name,
-          wins: allUsers[1].wins
-        };
+        db.game.tebakkalimat_ranking.top2 = allUsers[1].jid
       } else {
-        db.game.tebakkalimat_ranking.top2 = null;
+        db.game.tebakkalimat_ranking.top2 = null
       }
     }
     
     if (isTop1Now && oldTop1 !== m.sender) {
-      isNewTop1 = true;
+      isNewTop1 = true
     }
     
     const top5 = allUsers.slice(0, 5).map((u, i) => {
-      const userData = db.users[u.jid];
-      const total = userData?.tebakkalimat_total || 1;
-      const winRate = Math.round((u.wins / total) * 100);
-      const medal = i === 0 ? '👑' : ['🥇','🥈','🥉','4️⃣','5️⃣'][i];
-      return `${medal} ${u.name}\n   ├ ${u.wins} wins\n   └ ${winRate}% WR`;
-    }).join('\n\n');
+      const userData = usersTebakKalimat[u.jid]
+      const total = userData?.game?.tebakkalimat?.total || 1
+      const winRate = Math.round((u.wins / total) * 100)
+      const medal = i === 0 ? '👑' : ['🥇','🥈','🥉','4️⃣','5️⃣'][i] || `${i+1}️⃣`
+      return `${medal} ${u.name}\n   ├ ${u.wins} wins\n   └ ${winRate}% WR`
+    }).join('\n\n')
     
-    const difficultyEmoji = { 'easy': '🟢', 'medium': '🟡', 'hard': '🔴' };
-        await Ditss.sendMessage(
-  m.chat,
-  {
-    text: `
+    const difficultyEmoji = { 'easy': '🟢', 'medium': '🟡', 'hard': '🔴' }
+    
+    await Ditss.sendMessage(m.chat, {
+      text: `
 ${difficultyEmoji[difficulty]} *LEVEL ${difficulty.toUpperCase()} - BENAR!* 
 
 📝 *Kalimat:* ${game.soal}
@@ -2455,81 +1444,106 @@ ${difficultyEmoji[difficulty]} *LEVEL ${difficulty.toUpperCase()} - BENAR!*
 
 📊 *Statistik:*
 ├ Menang: ${userWins} kali
-├ Total: ${user.tebakkalimat_total} game
+├ Total: ${tebak.total} game
 └ Saldo: ${user.saldo}
 
 🏆 *Top 5 Leaderboard:*
-${readmore}
+${readmore || ''}
 ${top5 || 'Belum ada data...'}
 
 ${isNewTop1 ? '🎖️ *KAMU TOP 1 SEKARANG!*\n' : ''}
-    `,
-    footer: "Powered by asuma",
-    headerType: 1,
-    buttons: [
-    {
-      buttonId: `.${randomGame.cmd}`,
+      `,
+      footer: "Powered by asuma",
+      headerType: 1,
+      buttons: [{
+        buttonId: `.${randomGame.cmd}`,
         buttonText: { displayText: randomGame.name },
-          type: 1
-          }
-    ]
-  },
-  { quoted: m }
-)    
+        type: 1
+      }]
+    }, { quoted: m })
+    
     if (isNewTop1) {
-      const now = Date.now();
-      const lastNotif = db.game.top_notif[m.sender] || 0;
-      const cooldown = 6 * 60 * 60 * 1000;
+      const now = Date.now()
+      const lastNotif = db.game.top_notif[m.sender] || 0
+      const cooldown = 6 * 60 * 60 * 1000
       
       if (now - lastNotif > cooldown) {
         try {
           await Ditss.sendMessage(m.sender, {
             text: `🏆 *SELAMAT!*\n\nKamu sekarang menjadi TOP 1 di game Tebak Kalimat!\n\n🏅 Peringkat: #1\n✅ Kemenangan: ${userWins}\n💰 Reward: +${totalReward} saldo\n⏱️ Waktu: ${detik} detik\n\nPertahankan posisimu!`
-          });
-          db.game.top_notif[m.sender] = now;
+          })
+          db.game.top_notif[m.sender] = now
         } catch (err) {}
       }
     }
     
     if (oldTop1 && oldTop1 !== m.sender && isTop1Now) {
       try {
-        const lastWarned = db.game.top_notif[oldTop1] || 0;
+        const lastWarned = db.game.top_notif[oldTop1] || 0
         if (Date.now() - lastWarned > 3600000) {
           await Ditss.sendMessage(oldTop1, {
             text: `⚠️ *PERINGATAN!*\n\nPosisi TOP 1 kamu di game Tebak Kalimat telah disusul oleh *${displayName}*!\n\n🏅 Peringkat kamu sekarang: #2\n\nMain lagi untuk merebut kembali posisimu! 💪`
-          });
-          db.game.top_notif[oldTop1] = Date.now();
+          })
+          db.game.top_notif[oldTop1] = Date.now()
         }
       } catch (err) {}
     }
     
-    if (user.tebakkalimat_limit[difficulty] > 0) {
-      user.tebakkalimat_limit[difficulty]--;
+    if (tebak.limit[difficulty] > 0) {
+      tebak.limit[difficulty]--
     }
     
-    delete db.game.tebakkalimat[m.chat];
-    return;
+    tebak.cooldown = Date.now() + 30000
+    
+    delete db.game.tebakkalimat[m.chat]
+    return
   }
   
   if (similarity(userJawab, jawaban) >= 0.85) {
-    await m.reply(`🎯 *Hampir tepat!* (${Math.round(similarity(userJawab, jawaban) * 100)}% mirip)\nCoba lagi!`);
-    return;
+    await m.reply(`🎯 *Hampir tepat!* (${Math.round(similarity(userJawab, jawaban) * 100)}% mirip)\nCoba lagi!`)
+    return
   }
   
   await Ditss.sendMessage(m.chat, {
     react: { text: "❌", key: m.key }
-  }).catch(() => {});
+  }).catch(() => {})
   
   if (!db.users[m.sender]) {
     db.users[m.sender] = {
       name: m.pushName || 'Unknown',
-      tebakkalimat_wrong: 0
-    };
+      game: {}
+    }
   }
   
-  const wrongUser = db.users[m.sender];
-  if (!wrongUser.tebakkalimat_wrong) wrongUser.tebakkalimat_wrong = 0;
-  wrongUser.tebakkalimat_wrong++;
+  const user = db.users[m.sender]
+  
+  if (!user.game) user.game = {}
+  if (!user.game.tebakkalimat) {
+    user.game.tebakkalimat = {
+      win: 0,
+      total: 0,
+      wrong: 0,
+      best_time: Infinity,
+      last_win: 0,
+      last_difficulty: '',
+      top: false,
+      top_rank: 0,
+      cooldown: 0,
+      stats: {
+        easy: { win: 0, total: 0, waktu: [] },
+        medium: { win: 0, total: 0, waktu: [] },
+        hard: { win: 0, total: 0, waktu: [] }
+      },
+      limit: {
+        easy: 10,
+        medium: 5,
+        hard: 3
+      }
+    }
+  }
+  
+  user.game.tebakkalimat.wrong++
+  user.game.tebakkalimat.total++
   
   setTimeout(() => {
     const pesanSalah = [
@@ -2537,11 +1551,10 @@ ${isNewTop1 ? '🎖️ *KAMU TOP 1 SEKARANG!*\n' : ''}
       "Bukan kata itu!",
       "Coba pikirkan kata yang tepat untuk melengkapi kalimat!",
       "Masih ada waktu, coba lagi!"
-    ];
-   // m.reply(pesanSalah[Math.floor(Math.random() * pesanSalah.length)]);
-  }, 500);
-}       
-if (db.game.susunkata?.[m.chat] && !isCmd) {
+    ]
+  }, 500)
+}
+        if (db.game.susunkata?.[m.chat] && !isCmd) {
   const game = db.game.susunkata[m.chat];
   const jawaban = game.jawaban.toLowerCase().replace(/\s+/g, ' ').trim();
   const userJawab = m.text.toLowerCase().trim().replace(/\s+/g, ' ').trim();
@@ -5591,6 +4604,344 @@ fs.watch(pluginPath, { recursive: true }, async (eventType, filename) => {
 
         
         switch (command) {
+               case 'jadibot': {
+				if (!isPremium) return m.reply(ress.premium)
+				const nmrnya = text ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : m.sender
+				const onWa = await Ditss.onWhatsApp(nmrnya)
+				if (!onWa.length > 0) return m.reply('Nomer Tersebut Tidak Terdaftar Di Whatsapp!')
+				await JadiBot(Ditss, nmrnya, m, store)
+				m.reply(`Gunakan ${prefix}stopjadibot\nUntuk Berhenti`)
+                   //setLimit(m, db)
+			}
+			break
+case 'reset-default': {
+  if (!isOwner) return reply('❌ Khusus owner.')
+
+  const allUsers = await getAllUsers()
+  const limitUserr = UsersDbDefault.vip ? global.limit.vip : checkStatus(m.sender, premium) ? global.limit.premium : global.limit.free
+const moneyUser = UsersDbDefault.vip ? global.money.vip : checkStatus(m.sender, premium) ? global.money.premium : global.money.free
+
+  let total = 0
+
+  for (const [jid, oldUser] of Object.entries(allUsers)) {
+    const joinDate = oldUser?.joinDate || new Date().toISOString()
+
+    db.users[jid] = {
+      name: "Unknown" || 'Unknown',
+      joinDate, 
+      id: jid,
+      vip: false,
+      premium: false,
+      ban: false,
+      register: false,
+      limit: limitUserr,
+      money: moneyUser,
+      lastclaim: 0,
+      lastbegal: 0,
+      lastrampok: 0,
+      pc: 0,
+      afkTime: -1,
+      afkReason: '',
+      exp: 0,
+      level: 1,
+      rank: 0,
+      pornwarn: 0
+    }
+
+    total++
+  }
+
+  reply(`✅ *RESET DEFAULT BERHASIL*
+👥 Total user di-reset: ${total}
+🗓️ Join date aman (tidak berubah)`)
+}
+break
+                case 'tebakkalimat':
+case 'tkalimat': {
+  const subCmd = args[0]?.toLowerCase()
+  
+  if (subCmd === 'leaderboard' || subCmd === 'top' || subCmd === 'lb') {
+    const allUsersTebakKalimat = []
+    const usersTebakKalimatLb = await getAllUsers()
+    
+    for (let jid in usersTebakKalimatLb) {
+      const userData = usersTebakKalimatLb[jid]
+      if (userData && userData.game && userData.game.tebakkalimat && userData.game.tebakkalimat.win > 0) {
+        const stats = userData.game.tebakkalimat
+        const total = stats.total || 1
+        const win = stats.win || 0
+        const winRate = Math.round((win / total) * 100)
+        
+        allUsersTebakKalimat.push({
+          jid,
+          name: userData.name && userData.name !== 'Unknown' ? 
+            (userData.name.length > 15 ? userData.name.substring(0, 15) + '...' : userData.name) : 
+            jid.split('@')[0],
+          wins: win,
+          total: total,
+          winRate: winRate,
+          saldo: userData.saldo || 0,
+          isTop: stats.top || false
+        })
+      }
+    }
+    
+    allUsersTebakKalimat.sort((a, b) => b.wins - a.wins)
+    
+    if (allUsersTebakKalimat.length === 0) {
+      return m.reply('🏆 *Leaderboard Tebak Kalimat*\n\nBelum ada yang menang...\nJadilah yang pertama! 🎮')
+    }
+    
+    const top = allUsersTebakKalimat.slice(0, 10).map((user, i) => {
+      const medal = user.isTop ? '👑' : ['🥇', '🥈', '🥉'][i] || `${i+1}️⃣`
+      return `${medal} ${user.name}\n   ├ ${user.wins} wins\n   ├ ${user.winRate}% WR\n   └ ${user.saldo} saldo`
+    }).join('\n\n')
+    
+    const totalWins = allUsersTebakKalimat.reduce((sum, u) => sum + u.wins, 0)
+    const totalGames = allUsersTebakKalimat.reduce((sum, u) => sum + u.total, 0)
+    const globalWinRate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0
+    
+    return m.reply(`🏆 *LEADERBOARD TEBAK KALIMAT*\n\n${top}\n\n📊 *Global Stats:*\n├ Total Wins: ${totalWins}\n├ Total Games: ${totalGames}\n└ Win Rate: ${globalWinRate}%\n\n_Ketik .tebakkalimat stats untuk statistikmu_`)
+  }
+  
+  if (subCmd === 'stats' || subCmd === 'stat') {
+    const usersData = await getAllUsers()
+    const user = usersData[m.sender] || {}
+    const tebak = user.game?.tebakkalimat || {}
+    
+    const win = tebak.win || 0
+    const total = tebak.total || 0
+    const wrong = tebak.wrong || 0
+    const winRate = total > 0 ? Math.round((win / total) * 100) : 0
+    
+    const allUsersTebakKalimat = []
+    const usersTebakKalimat = await getAllUsers()
+    
+    for (let jid in usersTebakKalimat) {
+      const u = usersTebakKalimat[jid]
+      if (u && u.game && u.game.tebakkalimat && u.game.tebakkalimat.win > 0) {
+        allUsersTebakKalimat.push({
+          jid,
+          wins: u.game.tebakkalimat.win || 0
+        })
+      }
+    }
+    
+    allUsersTebakKalimat.sort((a, b) => b.wins - a.wins)
+    const position = allUsersTebakKalimat.findIndex(u => u.jid === m.sender) + 1
+    
+    const displayName = user.name && user.name !== 'Unknown' ? 
+      user.name : m.sender.split('@')[0]
+    
+    let statsText = `📊 *STATISTIK ${displayName.toUpperCase()}*\n\n`
+    statsText += `📝 Game: Tebak Kalimat\n`
+    statsText += `🏆 Posisi: ${position > 0 ? `#${position}` : 'Unranked'}\n`
+    statsText += `✅ Menang: ${win} kali\n`
+    statsText += `❌ Kalah: ${wrong} kali\n`
+    statsText += `🎮 Total Game: ${total} kali\n`
+    statsText += `📈 Win Rate: ${winRate}%\n`
+    statsText += `💰 Saldo: ${user.saldo || 0}\n`
+    statsText += `⭐ Rank: ${user.rank || 0}\n\n`
+    
+    if (tebak.top) {
+      statsText += `👑 *Kamu adalah TOP 1!*\n\n`
+    }
+    
+    if (tebak.stats) {
+      statsText += `🎚️ *STATS PER LEVEL:*\n`
+      Object.entries(tebak.stats).forEach(([diff, stats]) => {
+        if (stats.total > 0) {
+          const diffWinRate = Math.round((stats.win / stats.total) * 100)
+          const avgTime = stats.waktu && stats.waktu.length > 0 ? 
+            Math.round(stats.waktu.reduce((a, b) => a + b, 0) / stats.waktu.length) : 0
+          const emoji = diff === 'easy' ? '🟢' : diff === 'medium' ? '🟡' : '🔴'
+          statsText += `${emoji} ${diff.toUpperCase()}: ${stats.win}/${stats.total} (${diffWinRate}%)`
+          if (avgTime > 0) statsText += ` ⏱️${avgTime}s\n`
+          else statsText += '\n'
+        }
+      })
+    }
+    
+    if (tebak.best_time && tebak.best_time < Infinity) {
+      statsText += `\n⚡ *Best Time:* ${tebak.best_time} detik\n`
+    }
+    
+    if (tebak.limit) {
+      statsText += `\n🎮 *Limit Harian Tersisa:*\n`
+      statsText += `🟢 Easy: ${tebak.limit.easy || 0}/10\n`
+      statsText += `🟡 Medium: ${tebak.limit.medium || 0}/5\n`
+      statsText += `🔴 Hard: ${tebak.limit.hard || 0}/3\n`
+    }
+    
+    if (tebak.last_win) {
+      const lastWin = new Date(tebak.last_win)
+      const diff = tebak.last_difficulty || 'medium'
+      const emoji = diff === 'easy' ? '🟢' : diff === 'medium' ? '🟡' : '🔴'
+      statsText += `\n⏰ Terakhir Menang: ${lastWin.toLocaleDateString('id-ID')} (${emoji} ${diff.toUpperCase()})`
+    }
+    
+    return m.reply(statsText)
+  }
+  
+  let selectedDifficulty = 'random'
+  if (['easy', 'medium', 'hard'].includes(subCmd)) {
+    selectedDifficulty = subCmd
+    
+    const usersData = await getAllUsers()
+    const userData = usersData[m.sender]
+    
+    if (!userData) {
+      db.users[m.sender] = {
+        name: m.pushName || 'Unknown',
+        saldo: 0,
+        rank: 0,
+        game: {
+          tebakkalimat: {
+            limit: {
+              easy: 10,
+              medium: 5,
+              hard: 3
+            }
+          }
+        }
+      }
+    } else {
+      if (!userData.game) userData.game = {}
+      if (!userData.game.tebakkalimat) userData.game.tebakkalimat = {}
+      if (!userData.game.tebakkalimat.limit) {
+        userData.game.tebakkalimat.limit = {
+          easy: 10,
+          medium: 5,
+          hard: 3
+        }
+      }
+    }
+    
+    const user = db.users[m.sender] || usersData[m.sender] || {}
+    const remaining = user.game?.tebakkalimat?.limit?.[selectedDifficulty] || 0
+    
+    if (remaining <= 0 && !isPremium && !isCreator) {
+      return m.reply(`🎮 *Limit ${selectedDifficulty.toUpperCase()} Habis!*\n\nKamu sudah main level ${selectedDifficulty} terlalu banyak hari ini.\n\nCoba level lain atau tunggu besok!`)
+    }
+  }
+  
+  const usersData = await getAllUsers()
+  const userData = usersData[m.sender] || {}
+  const tebakData = userData.game?.tebakkalimat || {}
+  
+  if (tebakData.cooldown && Date.now() < tebakData.cooldown) {
+    const remaining = Math.ceil((tebakData.cooldown - Date.now()) / 1000)
+    return m.reply(`⏳ *Cooldown!*\n\nTunggu ${remaining} detik lagi sebelum main game Tebak Kalimat.`)
+  }
+  
+  if (!isCreator && !isPremium && userData.glimit < 1) {
+    return m.reply(`🎮 *Limit Game Habis!*\n\nLimit harian kamu sudah habis!\nReset setiap hari pukul 00:00 WIB.`)
+  }
+  
+  if (!db.game.tebakkalimat) db.game.tebakkalimat = {}
+  if (db.game.tebakkalimat[m.chat]) {
+    return m.reply('🎮 *Game sedang berjalan!*\n\nSelesaikan game yang ada dulu atau tunggu timeout.')
+  }
+  
+  if (!isCreator && !isPremium) {
+    if (!db.users[m.sender]) db.users[m.sender] = {}
+    db.users[m.sender].glimit = (db.users[m.sender].glimit || 0) - 1
+  }
+  
+  try {
+    const res = await fetchJson('https://api.asuma.my.id/v1/game/tebakkalimat?apikey=demo')
+    
+    if (!res.status || !res.result?.soal || !res.result?.jawaban) {
+      return m.reply('❌ Gagal mengambil soal.\nSilakan coba lagi nanti.')
+    }
+    
+    const soal = res.result.soal.trim()
+    const jawaban = res.result.jawaban.trim().toLowerCase()
+    
+    let finalDifficulty = selectedDifficulty
+    if (finalDifficulty === 'random') {
+      const difficulties = ['easy', 'medium', 'hard']
+      finalDifficulty = difficulties[Math.floor(Math.random() * difficulties.length)]
+    }
+    
+    const difficultySettings = {
+      'easy': {
+        time: 180000,
+        reward: 200,
+        emoji: '🟢',
+        desc: '3 menit'
+      },
+      'medium': {
+        time: 120000,
+        reward: 300,
+        emoji: '🟡',
+        desc: '2 menit'
+      },
+      'hard': {
+        time: 60000,
+        reward: 500,
+        emoji: '🔴',
+        desc: '1 menit'
+      }
+    }
+    
+    const settings = difficultySettings[finalDifficulty]
+    
+    const teks = `
+${settings.emoji} *TEBAK KALIMAT - LEVEL ${finalDifficulty.toUpperCase()}*
+
+📝 *Kalimat:* ${soal}
+
+⏱️ *Waktu:* ${settings.desc}
+💰 *Hadiah:* ${settings.reward} saldo
+💡 *Hint:* Ketik "bantuan" (dikirim ke DM)
+
+📝 *Perintah:*
+├ "nyerah" = Menyerah
+├ "bantuan" = Minta hint (DM)
+└ "stats" = Lihat statistik
+
+_Lengkapi kalimat di atas dengan kata yang tepat!_
+    `
+    
+    const sent = await Ditss.sendMessage(m.chat, { text: teks }, { quoted: m })
+    
+    db.game.tebakkalimat[m.chat] = {
+      id: 'tebakkalimat',
+      msgId: sent.key.id,
+      soal: soal,
+      jawaban: jawaban,
+      difficulty: finalDifficulty,
+      hadiah: settings.reward,
+      time: settings.time,
+      timeout: Date.now() + settings.time,
+      key: sent.key,
+      startedBy: m.sender,
+      startTime: Date.now()
+    }
+    
+    setTimeout(async () => {
+      if (db.game.tebakkalimat?.[m.chat] && Date.now() > db.game.tebakkalimat[m.chat].timeout) {
+        await Ditss.sendMessage(m.chat, {
+          text: `⏰ *WAKTU HABIS!*\n\nLevel: ${db.game.tebakkalimat[m.chat].difficulty.toUpperCase()}\nJawaban: *${db.game.tebakkalimat[m.chat].jawaban}*\n\nKetik .tebakkalimat untuk main lagi!`
+        })
+        delete db.game.tebakkalimat[m.chat]
+      }
+    }, settings.time)
+    
+    if (!db.users[m.sender]) db.users[m.sender] = {}
+    if (!db.users[m.sender].game) db.users[m.sender].game = {}
+    if (!db.users[m.sender].game.tebakkalimat) db.users[m.sender].game.tebakkalimat = {}
+    
+    db.users[m.sender].game.tebakkalimat.cooldown = Date.now() + 30000
+    
+  } catch (error) {
+    console.error('[TEBAK KALIMAT] API Error:', error)
+    m.reply('❌ Gagal terhubung ke server game.')
+  }
+  
+  break
+}
                 case 'cek': {
   if (!text) return reply('Contoh:\n.cek 120363423175289826@newsletter')
 
@@ -5751,125 +5102,495 @@ break
                 });
             }
             break;
-                case 'resetgame': {
-  if (!m.isOwner) return m.reply('❌ Khusus owner')
+     case 'mancing': {
+    if (!db.users[m.sender]) db.users[m.sender] = {};
+    if (!db.users[m.sender].rpg) db.users[m.sender].rpg = {
+        fishing: {
+            level: 1,
+            exp: 0,
+            energy: 100,
+            bait: 10,
+            coins: 100,
+            rod: "Bamboo Rod",
+            rodLevel: 1,
+            rodPower: 1,
+            totalCatch: 0,
+            inventory: {},
+            locations: ["Pond"],
+            currentLocation: "Pond",
+            lastFish: null,
+            recordFish: null,
+            achievements: [],
+            dailyStreak: 0,
+            lastDaily: 0,
+            lastFishTime: 0,
+            fishCaught: {},
+            upgrades: {
+                baitCapacity: 10,
+                energyCapacity: 100,
+                rodLuck: 1
+            }
+        }
+    };
 
-  const users = await getAllUsers()
-  let totalReset = 0
+    const fishing = db.users[m.sender].rpg.fishing;
+    const args = text.split(' ');
+    const action = args[0]?.toLowerCase() || 'help';
 
-  for (const jid in users) {
-    const user = db.users[jid]
-    if (!user) continue
+    switch(action) {
+        case 'start':
+        case 'fish': {
+            if (fishing.energy < 10) return m.reply(`⚡ Energy kamu habis! Butuh 10 energy untuk memancing.\nEnergy: ${fishing.energy}/100\n\nIsi energy dengan: .mancing energy`);
+            if (fishing.bait <= 0) return m.reply(`🪱 Umpan habis! Beli di toko:\n.mancing shop`);
+            
+            const now = Date.now();
+            if (now - fishing.lastFishTime < 10000) {
+                const wait = Math.ceil((10000 - (now - fishing.lastFishTime)) / 1000);
+                return m.reply(`⏳ Tunggu ${wait} detik sebelum memancing lagi!`);
+            }
 
-    let hasGameData = false
+            fishing.energy -= 10;
+            fishing.bait -= 1;
+            fishing.lastFishTime = now;
+            fishing.totalCatch++;
 
-    // === TEBAK KATA ===
-    if (
-      user.tebakkata_win !== undefined ||
-      user.tebakkata_total !== undefined ||
-      user.tebakkata_stats
-    ) {
-      user.tebakkata_win = 0
-      user.tebakkata_total = 0
-      user.tebakkata_wrong = 0
-      user.tebakkata_stats = {
-        easy: { win: 0, total: 0, waktu: [] },
-        medium: { win: 0, total: 0, waktu: [] },
-        hard: { win: 0, total: 0, waktu: [] }
-      }
-      user.tebakkata_lastwin = 0
-      user.tebakkata_last_difficulty = null
-      user.tebakkata_best_time = 0
-      user.tebakkata_limit = { easy: 10, medium: 5, hard: 3 }
-      hasGameData = true
+            const locationMultiplier = {
+                "Pond": 1,
+                "Lake": 1.5,
+                "River": 2,
+                "Ocean": 3,
+                "Abyss": 5
+            }[fishing.currentLocation] || 1;
+
+            const fishData = {
+                common: [
+                    { name: "Goldfish", emoji: "🐠", price: 5, weight: "0.1-0.5kg", exp: 5 },
+                    { name: "Carp", emoji: "🐟", price: 8, weight: "1-3kg", exp: 8 },
+                    { name: "Catfish", emoji: "🐱", price: 12, weight: "2-5kg", exp: 10 }
+                ],
+                uncommon: [
+                    { name: "Rainbow Trout", emoji: "🌈", price: 25, weight: "1-2kg", exp: 20 },
+                    { name: "Bass", emoji: "🎸", price: 30, weight: "2-4kg", exp: 25 },
+                    { name: "Pike", emoji: "🐊", price: 40, weight: "3-6kg", exp: 30 }
+                ],
+                rare: [
+                    { name: "Tuna", emoji: "🐟", price: 80, weight: "10-20kg", exp: 50 },
+                    { name: "Marlin", emoji: "🎯", price: 120, weight: "50-100kg", exp: 80 },
+                    { name: "Swordfish", emoji: "⚔️", price: 150, weight: "30-60kg", exp: 70 }
+                ],
+                epic: [
+                    { name: "Shark", emoji: "🦈", price: 300, weight: "100-200kg", exp: 150 },
+                    { name: "Whale", emoji: "🐋", price: 500, weight: "1000-2000kg", exp: 250 },
+                    { name: "Kraken", emoji: "🐙", price: 800, weight: "500-800kg", exp: 300 }
+                ],
+                legendary: [
+                    { name: "Golden Shark", emoji: "💰", price: 2000, weight: "50-100kg", exp: 500 },
+                    { name: "Leviathan", emoji: "🐉", price: 5000, weight: "2000kg+", exp: 1000 },
+                    { name: "Phoenix Fish", emoji: "🔥", price: 10000, weight: "???", exp: 2000 }
+                ]
+            };
+
+            let chance = Math.random() * 100 * locationMultiplier * fishing.upgrades.rodLuck;
+            let rarity = "common";
+            
+            if (chance > 90) rarity = "legendary";
+            else if (chance > 75) rarity = "epic";
+            else if (chance > 55) rarity = "rare";
+            else if (chance > 30) rarity = "uncommon";
+
+            const pool = fishData[rarity];
+            const caught = pool[Math.floor(Math.random() * pool.length)];
+            
+            if (!fishing.inventory[caught.name]) fishing.inventory[caught.name] = 0;
+            fishing.inventory[caught.name]++;
+            
+            if (!fishing.fishCaught[caught.name]) fishing.fishCaught[caught.name] = 0;
+            fishing.fishCaught[caught.name]++;
+
+            fishing.exp += caught.exp;
+            fishing.lastFish = caught;
+
+            if (!fishing.recordFish || caught.price > fishing.recordFish.price) {
+                fishing.recordFish = caught;
+            }
+
+            const expNeeded = fishing.level * 100;
+            let levelUpMsg = '';
+            if (fishing.exp >= expNeeded) {
+                fishing.level++;
+                fishing.exp = 0;
+                fishing.energy = 100;
+                fishing.coins += fishing.level * 50;
+                levelUpMsg = `\n\n🎉 LEVEL UP! 🎉\n🎣 Level ${fishing.level} Unlocked!\n💰 +${fishing.level * 50} Coins\n⚡ Energy Refilled!`;
+            }
+
+            m.reply(`
+🎣 TANGGAPAN BERHASIL! ${caught.emoji}
+
+🐟 ${caught.name}
+📊 Rarity: ${rarity.toUpperCase()}
+💰 Value: ${caught.price} Coins
+⚡ EXP: +${caught.exp}
+⚖️ Weight: ${caught.weight}
+🎣 Rod: ${fishing.rod}
+📍 Location: ${fishing.currentLocation}
+
+📊 STATUS:
+🎣 Level: ${fishing.level} (${fishing.exp}/${fishing.level * 100} EXP)
+⚡ Energy: ${fishing.energy}/100
+🪱 Bait: ${fishing.bait}
+💰 Coins: ${fishing.coins}
+${levelUpMsg}
+            `.trim());
+            break;
+        }
+
+        case 'shop': {
+            const shopItems = [
+                { name: "Bait Pack", price: 10, description: "+20 Bait", emoji: "🪱", type: "bait", value: 20 },
+                { name: "Energy Drink", price: 20, description: "+50 Energy", emoji: "⚡", type: "energy", value: 50 },
+                { name: "Copper Rod", price: 100, description: "Rod Level 2", emoji: "🔩", type: "rod", value: 2 },
+                { name: "Silver Rod", price: 300, description: "Rod Level 3", emoji: "🥈", type: "rod", value: 3 },
+                { name: "Gold Rod", price: 800, description: "Rod Level 4", emoji: "🥇", type: "rod", value: 4 },
+                { name: "Diamond Rod", price: 2000, description: "Rod Level 5", emoji: "💎", type: "rod", value: 5 },
+                { name: "Luck Charm", price: 500, description: "+1 Luck", emoji: "🍀", type: "luck", value: 1 },
+                { name: "Bait Box", price: 50, description: "+100 Bait", emoji: "📦", type: "bait", value: 100 }
+            ];
+
+            let shopMsg = "🛒 FISHING SHOP\n\n";
+            shopItems.forEach((item, i) => {
+                shopMsg += `${item.emoji} ${item.name}\n💰 ${item.price} Coins\n📝 ${item.description}\n.beli ${i + 1}\n──────────────\n`;
+            });
+            shopMsg += `\n💰 Your Coins: ${fishing.coins}\n\nUse: .beli [number] to buy`;
+            m.reply(shopMsg);
+            break;
+        }
+
+        case 'beli': {
+            const itemIndex = parseInt(args[1]) - 1;
+            const shopItems = [
+                { name: "Bait Pack", price: 10, type: "bait", value: 20 },
+                { name: "Energy Drink", price: 20, type: "energy", value: 50 },
+                { name: "Copper Rod", price: 100, type: "rod", value: 2 },
+                { name: "Silver Rod", price: 300, type: "rod", value: 3 },
+                { name: "Gold Rod", price: 800, type: "rod", value: 4 },
+                { name: "Diamond Rod", price: 2000, type: "rod", value: 5 },
+                { name: "Luck Charm", price: 500, type: "luck", value: 1 },
+                { name: "Bait Box", price: 50, type: "bait", value: 100 }
+            ];
+
+            if (isNaN(itemIndex) || itemIndex < 0 || itemIndex >= shopItems.length) {
+                return m.reply("❌ Item tidak valid! Gunakan .mancing shop untuk melihat daftar.");
+            }
+
+            const item = shopItems[itemIndex];
+            if (fishing.coins < item.price) {
+                return m.reply(`❌ Coins tidak cukup! Butuh ${item.price}, kamu punya ${fishing.coins}`);
+            }
+
+            fishing.coins -= item.price;
+            
+            switch(item.type) {
+                case "bait":
+                    fishing.bait += item.value;
+                    break;
+                case "energy":
+                    fishing.energy = Math.min(100, fishing.energy + item.value);
+                    break;
+                case "rod":
+                    if (item.value <= fishing.rodLevel) return m.reply("❌ Rod kamu sudah lebih baik!");
+                    fishing.rodLevel = item.value;
+                    fishing.rod = ["Bamboo", "Copper", "Silver", "Gold", "Diamond"][item.value - 1] + " Rod";
+                    fishing.rodPower = item.value;
+                    break;
+                case "luck":
+                    fishing.upgrades.rodLuck += item.value;
+                    break;
+            }
+
+            m.reply(`✅ Berhasil membeli ${item.name}!\n💰 -${item.price} Coins\n🎣 Silakan cek .mancing stats`);
+            break;
+        }
+
+        case 'inventory':
+        case 'inv': {
+            const inventory = fishing.inventory;
+            if (Object.keys(inventory).length === 0) {
+                return m.reply("🎒 Inventory kosong! Mulai memancing dengan .mancing start");
+            }
+
+            let totalValue = 0;
+            let invMsg = "🎒 FISHING INVENTORY\n\n";
+            
+            Object.entries(inventory).forEach(([fish, qty]) => {
+                const price = {
+                    "Goldfish": 5, "Carp": 8, "Catfish": 12,
+                    "Rainbow Trout": 25, "Bass": 30, "Pike": 40,
+                    "Tuna": 80, "Marlin": 120, "Swordfish": 150,
+                    "Shark": 300, "Whale": 500, "Kraken": 800,
+                    "Golden Shark": 2000, "Leviathan": 5000, "Phoenix Fish": 10000
+                }[fish] || 5;
+                
+                totalValue += price * qty;
+                invMsg += `${fish}: ${qty} pcs (${price * qty} Coins)\n`;
+            });
+
+            invMsg += `\n💰 Total Value: ${totalValue} Coins\n\nJual dengan: .jual [nama ikan/all]`;
+            m.reply(invMsg);
+            break;
+        }
+
+        case 'jual': {
+            const target = args[1];
+            if (!target) return m.reply("❌ Format: .jual [nama ikan/all]\nContoh: .jual Goldfish");
+
+            const prices = {
+                "Goldfish": 5, "Carp": 8, "Catfish": 12,
+                "Rainbow Trout": 25, "Bass": 30, "Pike": 40,
+                "Tuna": 80, "Marlin": 120, "Swordfish": 150,
+                "Shark": 300, "Whale": 500, "Kraken": 800,
+                "Golden Shark": 2000, "Leviathan": 5000, "Phoenix Fish": 10000
+            };
+
+            if (target.toLowerCase() === "all") {
+                let totalEarned = 0;
+                let soldFish = [];
+                
+                for (const [fish, qty] of Object.entries(fishing.inventory)) {
+                    const price = prices[fish] || 5;
+                    totalEarned += price * qty;
+                    soldFish.push(`${fish} x${qty}`);
+                }
+                
+                if (totalEarned === 0) return m.reply("❌ Tidak ada ikan untuk dijual!");
+                
+                fishing.coins += totalEarned;
+                fishing.inventory = {};
+                m.reply(`💰 Sold ALL Fish!\n📦 ${soldFish.join(", ")}\n💰 +${totalEarned} Coins\n🎣 Total: ${fishing.coins} Coins`);
+                break;
+            }
+
+            const fishName = Object.keys(prices).find(name => 
+                name.toLowerCase().includes(target.toLowerCase())
+            );
+
+            if (!fishName) return m.reply("❌ Ikan tidak ditemukan!");
+            if (!fishing.inventory[fishName]) return m.reply(`❌ Kamu tidak punya ${fishName}!`);
+
+            const qty = parseInt(args[2]) || fishing.inventory[fishName];
+            if (qty > fishing.inventory[fishName]) return m.reply(`❌ Kamu hanya punya ${fishing.inventory[fishName]} ${fishName}!`);
+
+            const price = prices[fishName] * qty;
+            fishing.coins += price;
+            fishing.inventory[fishName] -= qty;
+            if (fishing.inventory[fishName] <= 0) delete fishing.inventory[fishName];
+
+            m.reply(`💰 Sold ${fishName} x${qty}\n💰 +${price} Coins\n🎣 Total: ${fishing.coins} Coins`);
+            break;
+        }
+
+        case 'stats':
+        case 'profile': {
+            const nextLevelExp = fishing.level * 100;
+            const progress = Math.min(100, Math.floor((fishing.exp / nextLevelExp) * 100));
+            const progressBar = "█".repeat(progress / 5) + "░".repeat(20 - progress / 5);
+            
+            let statsMsg = `
+🎣 FISHING PROFILE 🎣
+
+👤 Level: ${fishing.level}
+⭐ EXP: ${fishing.exp}/${nextLevelExp}
+${progressBar} ${progress}%
+
+💰 Coins: ${fishing.coins}
+⚡ Energy: ${fishing.energy}/100
+🪱 Bait: ${fishing.bait}
+🎣 Rod: ${fishing.rod} (Lv.${fishing.rodLevel})
+📍 Location: ${fishing.currentLocation}
+🍀 Luck: ${fishing.upgrades.rodLuck}x
+
+🎯 TOTAL CATCH: ${fishing.totalCatch}
+📊 FISH TYPES: ${Object.keys(fishing.fishCaught || {}).length}
+            `;
+
+            if (fishing.recordFish) {
+                statsMsg += `\n🏆 RECORD FISH: ${fishing.recordFish.emoji} ${fishing.recordFish.name}\n💰 Value: ${fishing.recordFish.price} Coins`;
+            }
+
+            if (fishing.lastFish) {
+                statsMsg += `\n\n🎣 LAST CATCH: ${fishing.lastFish.emoji} ${fishing.lastFish.name}`;
+            }
+
+            m.reply(statsMsg);
+            break;
+        }
+
+        case 'locations':
+        case 'lokasi': {
+            const locations = [
+                { name: "Pond", emoji: "🌿", level: 1, cost: 0, description: "Beginner fishing spot" },
+                { name: "Lake", emoji: "🏞️", level: 5, cost: 100, description: "Calm waters, better fish" },
+                { name: "River", emoji: "🌊", level: 10, cost: 300, description: "Fast currents, rare fish" },
+                { name: "Ocean", emoji: "🌅", level: 20, cost: 800, description: "Deep sea adventures" },
+                { name: "Abyss", emoji: "🌀", level: 30, cost: 2000, description: "Legendary waters" }
+            ];
+
+            let locMsg = "🗺️ FISHING LOCATIONS\n\n";
+            locations.forEach(loc => {
+                const unlocked = fishing.locations.includes(loc.name);
+                const current = fishing.currentLocation === loc.name;
+                const canGo = fishing.level >= loc.level && unlocked;
+                
+                locMsg += `${loc.emoji} ${loc.name} ${current ? "📍" : ""}\n`;
+                locMsg += `Level ${loc.level} | ${loc.description}\n`;
+                locMsg += unlocked ? `✅ Unlocked` : `🔒 Locked (Level ${loc.level})\n`;
+                locMsg += canGo ? `\n.go ${loc.name}\n` : `\n`;
+                locMsg += "──────────────\n";
+            });
+
+            m.reply(locMsg);
+            break;
+        }
+
+        case 'go': {
+            const target = args.slice(1).join(' ');
+            if (!target) return m.reply("❌ Format: .go [location name]\nLihat .mancing locations");
+
+            const locations = {
+                "Pond": { level: 1, cost: 0 },
+                "Lake": { level: 5, cost: 100 },
+                "River": { level: 10, cost: 300 },
+                "Ocean": { level: 20, cost: 800 },
+                "Abyss": { level: 30, cost: 2000 }
+            };
+
+            if (!locations[target]) return m.reply("❌ Location tidak ditemukan!");
+            if (!fishing.locations.includes(target)) {
+                if (fishing.level < locations[target].level) {
+                    return m.reply(`❌ Level ${locations[target].level} required! Kamu level ${fishing.level}`);
+                }
+                if (fishing.coins < locations[target].cost) {
+                    return m.reply(`❌ ${locations[target].cost} Coins required! Kamu punya ${fishing.coins}`);
+                }
+                fishing.coins -= locations[target].cost;
+                fishing.locations.push(target);
+            }
+
+            fishing.currentLocation = target;
+            m.reply(`✅ Pindah ke ${target}!\n🎣 Happy fishing!`);
+            break;
+        }
+
+        case 'energy': {
+            if (fishing.energy >= 100) return m.reply("⚡ Energy sudah penuh!");
+            
+            const now = Date.now();
+            const rechargeTime = 60000;
+            const lastRecharge = fishing.lastFishTime || 0;
+            
+            if (now - lastRecharge < rechargeTime) {
+                const wait = Math.ceil((rechargeTime - (now - lastRecharge)) / 1000);
+                return m.reply(`⚡ Energy akan terisi otomatis dalam ${wait} detik\nAtau beli Energy Drink di shop!`);
+            }
+            
+            fishing.energy = Math.min(100, fishing.energy + 10);
+            m.reply(`⚡ Energy: ${fishing.energy}/100\nEnergy bertambah saat kamu menunggu!`);
+            break;
+        }
+
+        case 'daily': {
+            const now = Date.now();
+            const oneDay = 86400000;
+            
+            if (now - fishing.lastDaily < oneDay) {
+                const next = oneDay - (now - fishing.lastDaily);
+                const hours = Math.floor(next / 3600000);
+                const minutes = Math.floor((next % 3600000) / 60000);
+                return m.reply(`⏳ Daily reward tersedia dalam ${hours} jam ${minutes} menit!`);
+            }
+            
+            fishing.lastDaily = now;
+            fishing.dailyStreak++;
+            
+            const reward = 50 + (fishing.dailyStreak * 10);
+            fishing.coins += reward;
+            fishing.bait += 10;
+            fishing.energy = 100;
+            
+            m.reply(`
+🎁 DAILY REWARD - Day ${fishing.dailyStreak}
+💰 +${reward} Coins
+🪱 +10 Bait
+⚡ Energy Refilled!
+
+🔥 Streak Bonus: +${fishing.dailyStreak * 10} Coins
+💎 Total Coins: ${fishing.coins}
+            `.trim());
+            break;
+        }
+
+        case 'leaderboard':
+        case 'top': {
+            const allUsers = Object.entries(db.users)
+                .filter(([id, user]) => user.rpg?.fishing)
+                .map(([id, user]) => ({
+                    id: id.slice(0, 8),
+                    level: user.rpg.fishing.level,
+                    totalCatch: user.rpg.fishing.totalCatch,
+                    coins: user.rpg.fishing.coins,
+                    record: user.rpg.fishing.recordFish
+                }))
+                .sort((a, b) => b.level - a.level || b.totalCatch - a.totalCatch)
+                .slice(0, 10);
+            
+            let lbMsg = "🏆 FISHING LEADERBOARD 🏆\n\n";
+            allUsers.forEach((user, i) => {
+                const rank = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"][i] || `${i+1}.`;
+                lbMsg += `${rank} @${user.id}\n🎣 Lv.${user.level} | 🐟 ${user.totalCatch} catches | 💰 ${user.coins} coins\n`;
+                if (user.record) lbMsg += `🏆 Record: ${user.record.emoji} ${user.record.name}\n`;
+                lbMsg += "──────────────\n";
+            });
+            
+            m.reply(lbMsg);
+            break;
+        }
+
+        case 'help':
+        default: {
+            const helpMsg = `
+🎣 FISHING SIMULATOR 🎣
+
+Commands:
+• .mancing start - Mulai memancing
+• .mancing shop - Toko peralatan
+• .mancing inventory - Lihat inventory
+• .mancing stats - Lihat statistik
+• .mancing locations - Lihat lokasi
+• .mancing go [location] - Pindah lokasi
+• .mancing energy - Cek energy
+• .mancing daily - Hadiah harian
+• .mancing leaderboard - Papan peringkat
+
+Trading:
+• .beli [number] - Beli item dari shop
+• .jual [fish/all] - Jual ikan
+
+Tips:
+1. Level up untuk unlock lokasi baru
+2. Jual ikan untuk dapat coins
+3. Beli rod yang lebih baik
+4. Catch semua jenis ikan!
+            `.trim();
+            m.reply(helpMsg);
+            break;
+        }
     }
-
-    // === SUSUN KATA ===
-    if (
-      user.susunkata_win !== undefined ||
-      user.susunkata_total !== undefined ||
-      user.susunkata_stats
-    ) {
-      user.susunkata_win = 0
-      user.susunkata_total = 0
-      user.susunkata_wrong = 0
-      user.susunkata_stats = {
-        easy: { win: 0, total: 0, waktu: [] },
-        medium: { win: 0, total: 0, waktu: [] },
-        hard: { win: 0, total: 0, waktu: [] }
-      }
-      user.susunkata_lastwin = 0
-      user.susunkata_last_difficulty = null
-      user.susunkata_best_time = 0
-      user.susunkata_limit = { easy: 10, medium: 5, hard: 3 }
-      hasGameData = true
-    }
-
-    // === SIAPAKAH AKU ===
-    if (
-      user.siapakahaku_win !== undefined ||
-      user.siapakahaku_total !== undefined ||
-      user.siapakahaku_stats
-    ) {
-      user.siapakahaku_win = 0
-      user.siapakahaku_total = 0
-      user.siapakahaku_stats = {}
-      hasGameData = true
-    }
-
-    if (hasGameData) totalReset++
-  }
-
-  m.reply(`♻️ *RESET GAME GLOBAL BERHASIL!*
-
-👥 User terdampak: *${totalReset}*
-🧹 Hanya user yang pernah main game yang direset
-💾 User pasif tidak disentuh
-
-⚠️ Aman untuk database besar`)
+    break;
 }
-break
                 
                 // group 
-            case 'h':
-            case 'ht':
-            case 'hidetag': 
-            case 'tagal':
-            case 'tagall': 
-            case 'totag': {
-                if (!m.isGroup) return reply(ress.ingroup)
 
-    let groupMetadata = await Ditss.groupMetadata(m.chat)
-    let participants = groupMetadata.participants || []
-    let mentionList = participants.map(p => p.id)
-    let isAdmin = participants.some(p => p.admin && p.id === m.sender)
-    if (!m.isAdmin && !m.isCreator) return reply(ress.admin)
-    if (m.quoted && m.quoted.mtype && m.quoted.fakeObj) {
-        await Ditss.sendMessage(m.chat, {
-            forward: m.quoted.fakeObj,
-            mentions: mentionList
-        }, { quoted: m })
-    } else if (m.quoted && m.quoted.text) {
-        await Ditss.sendMessage(m.chat, {
-            text: m.quoted.text,
-            mentions: mentionList
-        }, { quoted: m })
-    } else if (text) {
-        await Ditss.sendMessage(m.chat, {
-            text: text,
-            mentions: mentionList
-        }, { quoted: m })
-    } else {
-        await Ditss.sendMessage(m.chat, {
-            text: `@${m.sender.split('@')[0]} telah melakukan hidetag grup.`,
-            mentions: [m.sender, ...mentionList]
-        }, { quoted: m })
-    }
-
-    break
-}
-                
-            case "editimg": {
+                           case "editimg": {
     if (!q) return m.reply("Masukkan prompt!\nContoh: *.editimg Using the model, create a 1/7 scale commercialized figurine based on the character(s) shown in the image, rendered in a realistic style within a real-life environment. The figurine is displayed on a computer desk and stands on a round, fully transparent acrylic base with no text or markings. On the computer monitor, show the 3D modeling process of this figurine, including visible modeling tools, wireframes, and interface elements. Next to the monitor, place a BANDAI-style toy packaging box printed with the original character artwork. The packaging should feature high-quality, two-dimensional flat illustrations in authentic commercial packaging style.*");
     try {
         let usedPrompt = q.trim();
@@ -5994,7 +5715,7 @@ case 'speed-bot': {
         
         const cpuLoad = await getCPUPercentage();
         const diskUsage = await getDiskUsage();
-        const uptime = getUptime();
+        const uptime = `${runtime(process.uptime())}`
         const network = await getNetworkStats();
         
         const totalMem = os.totalmem();
@@ -6142,20 +5863,7 @@ break;
     Ditss.sendMessage(m.chat, interactiveMessage, { quoted: m, mentions: [info.owner[0]] })
 }
 break
-                    case 'autogempa': {
-      global.autogempa = !global.autogempa;
-      if (global.autogempa) {
-        if (!gempaMonitor) {
-          const notifier = makeNotifier(Ditss);
-          gempaMonitor = new AutoGempa(notifier, { thresholdMag: 0, pollIntervalMs: 30000 });
-          gempaMonitor.start();
-        }
-        await Ditss.sendMessage(m.chat, { text: "✅ Auto notifikasi gempa *aktif* (global, multi channel)." });
-      } else {
-        await Ditss.sendMessage(m.chat, { text: "⛔ Auto notifikasi gempa *dimatikan*." });
-      }
-      break;
-    }
+
                 
                 case 'fb':
 case 'facebook': {
@@ -6207,29 +5915,6 @@ case 'getfb': {
   }, { quoted: m })
 }
 break
-                
-                case 's': case 'stiker': case 'sticker': {
-  if (!/image|video/gi.test(mime)) return m.reply("Kirim atau balas media (gambar/video)")
-  if (/video/gi.test(mime) && qmsg.seconds > 15) return m.reply("Durasi video maksimal 15 detik!")
-
-  try {
-    var image = await Ditss.downloadAndSaveMediaMessage(qmsg)
-
-    if (!image) return m.reply("Gagal mengunduh media!")
-
-    await Ditss.sendSticker(m.chat, image, m, {
-					packname: `stiker maker\ncreate by: ${pushname}  ${salam}`,
-					author: global.namabot
-				})
-    if (fs.existsSync(image)) fs.unlinkSync(image)
-
-  } catch (e) {
-    console.log("Error sticker:", e)
-    m.reply("Gagal membuat stiker.")
-  }
-}
-break
-                
                 			case 'totalpesan': {
 				let messageCount = {};
 				let messages = store?.messages[m.chat]?.array || [];
@@ -6247,50 +5932,7 @@ break
 				m.reply(result)
 			}
 			break
-case 'get': {
-    if (!text) return reply("Eh, bro! Mana linknya? 😅 Kirim dulu dong biar aku bisa ambil datanya.");
 
-    let args = text.split(' ');
-    let url = args[0];
-    let tipe = args[1] ? args[1].toLowerCase() : null;
-
-    if (!tipe) {
-        return Ditss.sendMessage(m.chat, {
-            text: `🔥 Pilih tipe konten yang mau aku ambil dari link ini:\n${url}`,
-            buttons: [
-                { buttonId: `.get ${url} img`, buttonText: { displayText: '🖼️ Image' }, type: 1 },
-                { buttonId: `.get ${url} vid`, buttonText: { displayText: '🎬 Video' }, type: 1 },
-                { buttonId: `.get ${url} zip`, buttonText: { displayText: '🗜️ Zip' }, type: 1 },
-                { buttonId: `.get ${url} html`, buttonText: { displayText: '📄 HTML' }, type: 1 },
-            ],
-            headerType: 1
-        }, { quoted: m });
-    }
-
-    try {
-        const response = await axios.get(url, { responseType: 'arraybuffer' });
-
-        switch(tipe) {
-            case 'img':
-                await Ditss.sendMessage(m.chat, { image: response.data, caption: "🖼️ Nih gambarnya!" }, { quoted: m });
-                break;
-            case 'vid':
-                await Ditss.sendMessage(m.chat, { video: response.data, caption: "🎬 Nih videonya!" }, { quoted: m });
-                break;
-            case 'html':
-                await Ditss.sendMessage(m.chat, { document: response.data, fileName: "file.html", mimetype: "text/html", caption: "📄 File HTML siap dikirim!" }, { quoted: m });
-                break;
-            case 'zip':
-            default:
-                await Ditss.sendMessage(m.chat, { document: response.data, fileName: "file.zip", mimetype: "application/zip", caption: "🗜️ File ZIP berhasil diambil!" }, { quoted: m });
-                break;
-        }
-    } catch (error) {
-        console.error("❌ Error fetching data:", error);
-        await reply("Oops! Gagal ambil datanya 😅. Coba lagi nanti ya.");
-    }
-    break;
-}
                 case 'backup': {
     if (!isCreator) return m.reply(ress.owner);
 
@@ -6427,179 +6069,6 @@ case 'get': {
     }
     break;
 }
-                 case 'tovideo':
-  case 'tovid':
-   case 'tomp4': 
-    case 'toimg':
-     case 'toimage':
-      case 'tovidio': {
-  const user = db.users[m.sender]
-  if (user.limit < 1) return reply(ress.limit)
-
-  if (!quoted) return m.reply('⚠️ Balas stikernya terlebih dahulu.')
-  if (!/webp/.test(mime)) return reply(`⚠️ Balas sticker dengan caption *${prefix + command}*`)
-
-  await Ditss.sendMessage(m.chat, {
-    react: {
-      text: "⏱️",
-      key: m.key,
-    }
-  })
-
-  let media
-  try {
-    media = await Ditss.downloadAndSaveMediaMessage(quoted)
-  } catch (e) {
-    return reply('❌ Gagal download media.')
-  }
-   let fileUrl = await CatBox(media)
-   let convertedVideo = await webp2mp4File(fileUrl)
-
-  let ran = await getRandom('.png')
-  exec(`ffmpeg -i ${media} ${ran}`, async (err) => {
-    try {
-      fs.unlinkSync(media)
-    } catch (e) {
-      console.log('⚠️ Gagal hapus file sementara:', e)
-    }
-
-    if (err) {
-      return Ditss.sendMessage(m.chat, {
-                        video: {
-                            url: convertedVideo
-                        },
-                        caption: 'done'
-                    }, {
-                        quoted: m
-                    })
-    }
-
-    try {
-      let buffer = fs.readFileSync(ran)
-      await Ditss.sendMessage(m.chat, {
-        image: buffer
-      }, {
-        quoted: m
-      })
-      fs.unlinkSync(ran)
-    } catch (e) {
-      console.error('❌ Gagal kirim atau hapus file:', e)
-      return reply('❌ Terjadi kesalahan saat mengirim gambar.')
-    }
-  })
-
-  if (!isCreator && !isPremium) {
-    user.limit -= 1
-  }
-}
-break
- case 'mf':
-case 'mediafire': {
-  try {
-    if (!text) return m.reply(`Contoh: ${prefix + command} https://www.mediafire.com/file/xxxxx`);
-    if (!text.includes('mediafire.com')) return m.reply('Harus berupa link MediaFire!');
-
-    const cleanUrl = text.trim();
-
-    // ✅ COBA HEAD DULU — VALIDASI LINK
-    try {
-      const headCheck = await axios.head(cleanUrl, { timeout: 5000 });
-      if (headCheck.status !== 200) {
-        return m.reply('❌ Link MediaFire tidak valid atau sudah dihapus!');
-      }
-    } catch (headErr) {
-      return m.reply('❌ Link MediaFire tidak bisa diakses — mungkin butuh verifikasi manual.');
-    }
-
-    const apiUrl = `https://ditss.vercel.app/api/download/mediafire?apikey=DitssGanteng&url=${encodeURIComponent(cleanUrl)}`;
-
-    let res;
-    try {
-      res = await fetchJson(apiUrl);
-    } catch (apiErr) {
-      console.error('API Error:', apiErr);
-      res = null;
-    }
-
-    let fileName = 'unknown_file';
-    let fileSize = 'Unknown';
-    let downloadLink = cleanUrl;
-    let uploadDate = '-';
-    let mimeType = 'application/octet-stream';
-
-    if (res && res.status && res.result) {
-      // ✅ Ambil dari API
-      ({
-        fileName,
-        fileSize,
-        downloadLink,
-        uploadDate,
-        mimeType
-      } = res.result);
-    } else {
-      // ✅ FALLBACK — AMBIL NAMA FILE DARI URL
-      try {
-        const urlObj = new URL(cleanUrl);
-        const pathParts = urlObj.pathname.split('/');
-        const fileId = pathParts[2]; // z36wk9xqzo9vl8q
-        const rawFileName = pathParts[3]; // AsumA+V2.7.zip
-        fileName = decodeURIComponent(rawFileName.replace(/\+/g, ' '));
-      } catch (e) {
-        fileName = 'downloaded_file';
-      }
-    }
-
-    const info = `
-📂 *MEDIAFIRE DOWNLOADER*
-───────────────────────
-📄 *Nama File:* ${fileName}
-📏 *Ukuran File:* ${fileSize}
-📆 *Diunggah:* ${uploadDate}
-🌐 *Link Asli:* ${cleanUrl}
-
-${res ? '⏳ *Tunggu sebentar, mengirim file...*' : '⚠️ *API sedang lambat — kirim link manual saja*'}
-    `.trim();
-    await m.reply(info);
-    await m.react(res ? "🚀" : "⚠️");
-    if (res && res.status) {
-      const safeUrl = downloadLink
-        .replace(/ /g, '%20')
-        .replace(/\+/g, '%2B')
-        .replace(/\?/g, '%3F')
-        .replace(/&/g, '%26');
-
-      if (fileSize.includes('GB') || (fileSize.includes('MB') && parseFloat(fileSize) > 500)) {
-        return m.reply(`⚠️ File terlalu besar (${fileSize}) — WhatsApp tidak bisa kirim.\n\nSilakan download manual:\n${safeUrl}`);
-      }
-
-      let media;
-      try {
-        media = await getBuffer(safeUrl);
-      } catch (dlErr) {
-        return m.reply(`❌ Gagal download. Coba manual:\n${safeUrl}`);
-      }
-
-      await Ditss.sendMessage(m.chat, {
-        document: media,
-        fileName: fileName,
-        mimetype: mimeType,
-        caption: `✅ Berhasil!\n\n📂 *${fileName}*\n📏 Ukuran: ${fileSize}`
-      }, {
-        quoted: m
-      });
-
-      await m.react("✅");
-    } else {
-      await m.reply(`🔗 *Download Manual:*\n${cleanUrl}\n\n_(Buka di browser, lewati iklan, lalu download)_`);
-    }
-
-  } catch (err) {
-    console.error('MediaFire Final Error:', err);
-    await m.react("❌");
-    m.reply('❌ Gagal proses link. Coba lagi nanti atau gunakan link lain.');
-  }
-  break;
-}
                 case 'cekidch': case 'idch': {
  if (!text) return reply("linkchnya mana")
  if (!text.includes("https://whatsapp.com/channel/")) return reply("Link tautan tidak valid")
@@ -6644,48 +6113,7 @@ ${res ? '⏳ *Tunggu sebentar, mengirim file...*' : '⚠️ *API sedang lambat �
     await m.react("✨")
  }
  break
-                case 'kick':
-case 'dor':
-case 'buang':
-case '😛':
-case 'hedsot':
-case 'duar': {
-if (!m.isGroup) return reply(ress.group)         
-if (!isCreator && !isAdmin) return reply(ress.admin)   
-if (!isBotAdmin) return reply(ress.BotAdmin)     
- let target
- if (m.mentionedJid && m.mentionedJid[0]) {
- target = m.mentionedJid[0]
- }
- else if (m.quoted) {
- target = m.quoted.sender
- }
- else if (args[0]) {
- let input = args[0].replace(/[^0-9]/g, '')
- let found = participants.find(p => p.id.replace(/[^0-9]/g, '').endsWith(input))
- if (found) target = found.id
- }
- if (!target) return reply('❌ Target tidak ditemukan!\nGunakan: tag / reply / nomor / ujung nomor.')
- if (global.info.owner.includes(target)) return reply('❌ Tidak bisa kick Owner.')
- if (target === m.sender) return reply('❌ Tidak bisa kick diri sendiri.')
 
- let buffer = "https://raw.githubusercontent.com/media-clouds/upload/id/447920601019/mce05oaq.webp"
-
- Ditss.sendSticker(m.chat, buffer, m, {
- packname: "yahahahahahahahah di kick😛",
- author: global.info.namabot
- })
- try {
- await Ditss.groupParticipantsUpdate(m.chat, [target], 'remove')
- m.reply(`✅ Sukses mengeluarkan @${target.split('@')[0]}`, null, {
- mentions: [target]
- })
- } catch (err) {
- console.log(err)
- m.reply('❌ Gagal mengeluarkan user, mungkin bukan anggota grup atau sudah keluar.')
- }
-}
-break
  case 'add':
 case 'culik':
 case 'masukin': {
@@ -6794,6 +6222,144 @@ break;
 
 
 
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+          case 'chess': case 'catur': case 'ct': {
+    if (!m.isGroup) return m.reply(ress.ingroup)
+    if (chess[m.chat] && !(chess[m.chat] instanceof Chess)) {
+        chess[m.chat] = Object.assign(new Chess(chess[m.chat].fen), chess[m.chat]);
+    }
+    switch(args[0]) {
+        case 'start':
+        if (!chess[m.chat]) return m.reply('Tidak Ada Sesi Yang Sedang Berlangsung!')
+        if (!chess[m.chat].acc) return m.reply('Pemain Tidak Lengkap!')
+        if (chess[m.chat].player1 !== m.sender) return m.reply('Hanya Pemain Utama Yang bisa Memulai!')
+        if (chess[m.chat].turn !== m.sender && !chess[m.chat].start) {
+            const encodedFen = encodeURI(chess[m.chat]._fen);
+            let boardUrls = [`https://www.chess.com/dynboard?fen=${encodedFen}&size=3&coordinates=inside`,`https://www.chess.com/dynboard?fen=${encodedFen}&board=graffiti&piece=graffiti&size=3&coordinates=inside`,`https://chessboardimage.com/${encodedFen}.png`,`https://backscattering.de/web-boardimage/board.png?fen=${encodedFen}`,`https://fen2image.chessvision.ai/${encodedFen}`];
+            for (let url of boardUrls) {
+                try {
+                    const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+                    let { key } = await m.reply({ image: data, caption: `♟️${command.toUpperCase()} GAME\n\nGiliran: @${m.sender.split('@')[0]}\n\nReply Pesan Ini untuk lanjut bermain!\nExample: from to -> b1 c3`, mentions: [m.sender] });
+                    chess[m.chat].start = true
+                    chess[m.chat].turn = m.sender
+                    chess[m.chat].id = key.id;
+                    return;
+                } catch (e) {}
+            }
+            if (!chess[m.chat].key) {
+                m.reply(`Gagal Memulai Permainan!\nGagal Mengirim Papan Permainan!`)
+            }
+        } else if ([chess[m.chat].player1, chess[m.chat].player2].includes(m.sender)) {
+            const isPlayer2 = chess[m.chat].player2 === m.sender
+            const nextPlayer = isPlayer2 ? chess[m.chat].player1 : chess[m.chat].player2;
+            const encodedFen = encodeURI(chess[m.chat]._fen);
+            const boardUrls = [`https://www.chess.com/dynboard?fen=${encodedFen}&size=3&coordinates=inside${!isPlayer2 ? '&flip=true' : ''}`,`https://www.chess.com/dynboard?fen=${encodedFen}&board=graffiti&piece=graffiti&size=3&coordinates=inside${!isPlayer2 ? '&flip=true' : ''}`,`https://chessboardimage.com/${encodedFen}${!isPlayer2 ? '-flip' : ''}.png`,`https://backscattering.de/web-boardimage/board.png?fen=${encodedFen}&coordinates=true&size=765${!isPlayer2 ? '&orientation=black' : ''}`,`https://fen2image.chessvision.ai/${encodedFen}/${!isPlayer2 ? '?pov=black' : ''}`];
+            for (let url of boardUrls) {
+                try {
+                    chess[m.chat].turn = chess[m.chat].turn === m.sender ? m.sender : nextPlayer;
+                    const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+                    let { key } = await m.reply({ image: data, caption: `♟️CHESS GAME\n\nGiliran: @${chess[m.chat].turn.split('@')[0]}\n\nReply Pesan Ini untuk lanjut bermain!\nExample: from to -> b1 c3`, mentions: [chess[m.chat].turn] });
+                    chess[m.chat].id = key.id;
+                    break;
+                } catch (e) {}
+            }
+        }
+        break
+        case 'join':
+        if (chess[m.chat]) {
+            if (chess[m.chat].player1 !== m.sender) {
+                if (chess[m.chat].acc) return m.reply(`Pemain Sudah Terisi\nSilahkan Coba Lagi Nanti`)
+                let teks = chess[m.chat].player2 === m.sender ? 'TerimaKasih Sudah Mau Bergabung' : `Karena @${chess[m.chat].player2.split('@')[0]} Tidak Merespon\nAkan digantikan Oleh @${m.sender.split('@')[0]}`
+                chess[m.chat].player2 = m.sender
+                chess[m.chat].acc = true
+                m.reply(`${teks}\nSilahkan @${chess[m.chat].player1.split('@')[0]} Untuk Memulai Game (${prefix + command} start)`)
+            } else m.reply(`Kamu Sudah Bergabung\nBiarkan Orang Lain Menjadi Lawanmu!`)
+        } else m.reply('Tidak Ada Sesi Yang Sedang Berlangsung!')
+        break
+        case 'end': case 'leave':
+        if (chess[m.chat]) {
+            if (![chess[m.chat].player1, chess[m.chat].player2].includes(m.sender)) return m.reply('Hanya Pemain yang Bisa Menghentikan Permainan!')
+            delete chess[m.chat]
+            m.reply('Sukses Menghapus Sesi Game')
+        } else m.reply('Tidak Ada Sesi Yang Sedang Berlangsung!')
+        break
+        case 'bot': case 'computer':
+        if (chess[m.sender]) {
+            delete chess[m.sender];
+            return m.reply('Sukses Menghapus Sesi vs BOT')
+        } else {
+            // PERBAIKAN: DEFAUT_POSITION -> DEFAULT_POSITION
+            chess[m.sender] = new Chess(DEFAULT_POSITION);
+            chess[m.sender]._fen = chess[m.sender].fen();
+            chess[m.sender].turn = m.sender;
+            chess[m.sender].botMode = true;
+            chess[m.sender].time = Date.now();
+            const encodedFen = encodeURI(chess[m.sender]._fen);
+            const boardUrls = [`https://www.chess.com/dynboard?fen=${encodedFen}&size=3&coordinates=inside`,`https://www.chess.com/dynboard?fen=${encodedFen}&board=graffiti&piece=graffiti&size=3&coordinates=inside`,`https://chessboardimage.com/${encodedFen}.png`,`https://backscattering.de/web-boardimage/board.png?fen=${encodedFen}&coordinates=true&size=765`,`https://fen2image.chessvision.ai/${encodedFen}/`];
+            for (let url of boardUrls) {
+                try {
+                    const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+                    let { key } = await m.reply({ image: data, caption: `♟️CHESS GAME\n\nGiliran: @${chess[m.sender].turn.split('@')[0]}\n\nReply Pesan Ini untuk lanjut bermain!\nExample: from to -> b1 c3`, mentions: [chess[m.sender].turn] });
+                    chess[m.sender].id = key.id;
+                    break;
+                } catch (e) {}
+            }
+        }
+        break
+        default:
+        if (/^@?\d+$/.test(args[0])) {
+            if (chess[m.chat]) return m.reply('Masih Ada Sesi Yang Belum Diselesaikan!')
+            if (m.mentionedJid.length < 1) return m.reply('Tag Orang yang Mau diajak Bermain!')
+            // PERBAIKAN: DEFAUT_POSITION -> DEFAULT_POSITION
+            chess[m.chat] = new Chess(DEFAULT_POSITION);
+            chess[m.chat]._fen = chess[m.chat].fen();
+            chess[m.chat].player1 = m.sender
+            chess[m.chat].player2 = m.mentionedJid ? m.mentionedJid[0] : null
+            chess[m.chat].time = Date.now();
+            chess[m.chat].turn = null
+            chess[m.chat].acc = false
+            m.reply(`♟️${command.toUpperCase()} GAME\n\n@${m.sender.split('@')[0]} Menantang @${m.mentionedJid[0].split('@')[0]}\nUntuk Bergabung ${prefix + command} join`)
+        } else {
+            m.reply(`♟️${command.toUpperCase()} GAME\n\nExample: ${prefix + command} @tag/number\n- start\n- leave\n- join\n- computer\n- end`)
+        }
+    }
+}
+break
 case 'tebakjkt48':
 case 'tjkt48': {
   const subCmd = args[0]?.toLowerCase();
@@ -9906,6 +9472,7 @@ case 'nsfw': {
 
     break
 }
+                
       case 'sc':
 case 'script': {
   const interactiveButtons = [
@@ -10036,6 +9603,8 @@ if (isCmd && global.plugins[command]) {
                 text,
                 qmsg,
                 mime,
+                set,
+                userdb,
                 editp
             })
         }

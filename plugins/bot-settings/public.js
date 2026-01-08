@@ -1,48 +1,37 @@
-let publicMode = async (m, { args, set }) => {
+let publicMode = async (m, { args, set, command }) => {
   if (!m.isCreator)
     return m.reply('❌ Khusus owner')
 
-  if (!args[0]) {
+  const cmd = command
+  const opt = (args[0] || '').toLowerCase()
+
+  if (!opt) {
     return m.reply(
 `⚙️ *MODE BOT*
 
-Status:
+Status saat ini:
 • Public : ${set.public ? 'AKTIF' : 'NONAKTIF'}
-• Self   : ${!set.public ? 'AKTIF' : 'NONAKTIF'}
+• Self   : ${set.public ? 'NONAKTIF' : 'AKTIF'}
 
 Gunakan:
-.public on
-.public off
-.self on
-.self off`
+.public on | off
+.self on | off`
     )
   }
-
-  let cmd = m.command
+  if (!['on', 'off'].includes(opt))
+    return m.reply('❌ Gunakan hanya: on / off')
   if (cmd === 'public') {
-    if (args[0] === 'on') {
-      set.public = true
-      return m.reply('✅ Bot sekarang *PUBLIC*')
-    }
-
-    if (args[0] === 'off') {
-      set.public = false
-      return m.reply('❌ Bot sekarang *SELF (owner only)*')
-    }
+    set.public = opt === 'on'
   }
+
   if (cmd === 'self') {
-    if (args[0] === 'on') {
-      set.public = false
-      return m.reply('❌ Bot sekarang *SELF (owner only)*')
-    }
-
-    if (args[0] === 'off') {
-      set.public = true
-      return m.reply('✅ Bot sekarang *PUBLIC*')
-    }
+    set.public = opt === 'off'
   }
-
-  m.reply('❌ Gunakan: on / off')
+  return m.reply(
+    set.public
+      ? '✅ Bot sekarang *PUBLIC*'
+      : '🔒 Bot sekarang *SELF (owner only)*'
+  )
 }
 
 publicMode.help = ['public on', 'public off', 'self on', 'self off']

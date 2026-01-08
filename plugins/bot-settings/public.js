@@ -2,7 +2,6 @@ let publicMode = async (m, { args, set, command }) => {
   if (!m.isCreator)
     return m.reply('❌ Khusus owner')
 
-  const cmd = command
   const opt = (args[0] || '').toLowerCase()
 
   if (!opt) {
@@ -11,29 +10,29 @@ let publicMode = async (m, { args, set, command }) => {
 
 Status saat ini:
 • Public : ${set.public ? 'AKTIF' : 'NONAKTIF'}
-• Self   : ${set.self ? 'AKTIF' : 'NONAKTIF'}
+• Self   : ${!set.public ? 'AKTIF' : 'NONAKTIF'}
 
 Gunakan:
 .public on | off
 .self on | off`
     )
   }
-  
+
   if (!['on', 'off'].includes(opt))
     return m.reply('❌ Gunakan hanya: on / off')
-  
-  if (cmd === 'public') {
+
+  if (command === 'public') {
     set.public = (opt === 'on')
-    if (opt === 'on') set.self = false  
-  } else if (cmd === 'self') {
-    set.self = (opt === 'on')
-    if (opt === 'on') set.public = false  
   }
-  
+
+  if (command === 'self') {
+    set.public = (opt === 'on') // sesuai permintaan kamu
+  }
+
   return m.reply(
     set.public
       ? '✅ Bot sekarang *PUBLIC* (semua bisa pakai)'
-      : '🔒 Bot sekarang *SELF (owner only)*'
+      : '🔒 Bot sekarang *SELF* (owner only)'
   )
 }
 

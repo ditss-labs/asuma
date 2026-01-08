@@ -11,7 +11,7 @@ let publicMode = async (m, { args, set, command }) => {
 
 Status saat ini:
 • Public : ${set.public ? 'AKTIF' : 'NONAKTIF'}
-• Self   : ${!set.public ? 'AKTIF' : 'NONAKTIF'}  // Ini dibalik karena self = !public
+• Self   : ${set.self ? 'AKTIF' : 'NONAKTIF'}
 
 Gunakan:
 .public on | off
@@ -22,11 +22,12 @@ Gunakan:
   if (!['on', 'off'].includes(opt))
     return m.reply('❌ Gunakan hanya: on / off')
   
-  
   if (cmd === 'public') {
-    set.public = (opt === 'on')  
+    set.public = (opt === 'on')
+    if (opt === 'on') set.self = false  
   } else if (cmd === 'self') {
-    set.public = (opt === 'off') 
+    set.self = (opt === 'on')
+    if (opt === 'on') set.public = false  
   }
   
   return m.reply(

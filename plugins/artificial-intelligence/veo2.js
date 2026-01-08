@@ -22,7 +22,7 @@ let veo2 = async (m, { conn: Ditss, text }) => {
     
     const { video_url, prompt } = data.result
     
-    await m.reply(`🎬 *VE02 AI Video Generator*\n\n📝 *Prompt:* ${prompt}\n🔗 *Video URL:* ${video_url}\n⏱️ *Waktu proses:* ${data.responseTime}\n\n⏳ *Mengunduh video...*`)
+    //await m.reply(`🎬 *VE02 AI Video Generator*\n\n📝 *Prompt:* ${prompt}\n🔗 *Video URL:* ${video_url}\n⏱️ *Waktu proses:* ${data.responseTime}\n\n⏳ *Mengunduh video...*`)
     
     const videoResponse = await axios.get(video_url, {
       responseType: 'arraybuffer',

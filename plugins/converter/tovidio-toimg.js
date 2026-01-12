@@ -1,8 +1,7 @@
 import fs from 'fs';
+import { UguuSe } from '../../lib/utils/uploader.js'
 import { exec } from 'child_process';
 import { promisify } from 'util';
-
-const execAsync = promisify(exec);
 
 let stickerToImage = async (m, { conn: Ditss }) => {
     const q = m.quoted;
@@ -11,44 +10,32 @@ let stickerToImage = async (m, { conn: Ditss }) => {
     if (q.mtype !== 'stickerMessage') return m.reply('Reply stiker!');
     
     try {
+        //m.reply('Sedang memproses...');
         const media = await q.download();
-        const timestamp = Date.now();
-        const inputPath = `./database/sampah/${timestamp}.webp`;
+        let uploadedUrl = await UguuSe(media);
+        const isAnimated = q.isAnimated || false;
         
-        fs.writeFileSync(inputPath, media);
-        
-        let outputPath, mediaType, caption;
-        
-        if (q.isAnimated) {
-            outputPath = inputPath.replace('.webp', '.mp4');
-            mediaType = 'video';
-            caption = '✅ Sticker animasi → Video';
-            
-            await execAsync(`ffmpeg -i ${inputPath} -movflags faststart -pix_fmt yuv420p -vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" ${outputPath}`);
+        if (isAnimated) {
+            await Ditss.sendMessage(m.chat, {
+                video: { url: uploadedUrl.url},
+                mimetype: 'video/mp4',
+                caption: `✅ Sticker animasi debug:${uploadedUrl.url}`
+            }, { quoted: m });
         } else {
-            outputPath = inputPath.replace('.webp', '.png');
-            mediaType = 'image';
-            caption = '✅ Sticker → Gambar';
-            
-            await execAsync(`ffmpeg -i ${inputPath} ${outputPath}`);
+            await Ditss.sendMessage(m.chat, {
+                image: media,
+                caption: '✅ Sticker → Gambar'
+            }, { quoted: m });
         }
-        
-        await Ditss.sendMessage(m.chat, {
-            [mediaType]: fs.readFileSync(outputPath),
-            caption: caption
-        }, { quoted: m });
-        
-        fs.unlinkSync(inputPath);
-        fs.unlinkSync(outputPath);
         
     } catch (error) {
         console.error(error);
-        return m.reply('Gagal convert sticker');
+        m.reply('Gagal mengconvert sticker');
     }
 };
 
 stickerToImage.help = ['toimg'];
 stickerToImage.tags = ['converter'];
-stickerToImage.command = ['toimg', 'toimage', 'stickertoimg'];
+stickerToImage.command = ['toimg', 'toimage', 'stickertoimg', 'tovid', 'tovideo', 'tomp4'];
 
 export default stickerToImage;

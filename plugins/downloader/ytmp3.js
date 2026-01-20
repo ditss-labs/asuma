@@ -4,31 +4,40 @@ let ytmp3 = async (m, { conn: Ditss, text, usedPrefix, command }) => {
   if (!text) return m.reply(`🎵 *Contoh:* ${usedPrefix + command} https://youtube.com/watch?v=...`)
   
   try {
-    const url = text.trim()
-    const downloadUrl = `https://api.nekolabs.web.id/downloader/youtube/v1?url=${encodeURIComponent(url)}&format=mp3`
-    
-    const response = await axios.get(downloadUrl)
-    
-    if (!response.data?.success || !response.data?.result?.downloadUrl) {
+    const encodedUrl = encodeURIComponent(text.trim())
+    const apiUrl = `https://api.asuma.my.id/v1/download/youtube?url=${encodedUrl}&quality=mp3`
+    const response = await axios.get(apiUrl, {
+      timeout: 90000 // 
+    })
+    if (!response.data?.status || !response.data?.result?.download?.main) {
       return m.reply('❌ Gagal mendapatkan link download.')
     }
     
-    const audioInfo = response.data.result
-    
+    const data = response.data
+    const result = data.result
     await Ditss.sendMessage(
       m.chat,
       {
-        audio: { url: audioInfo.downloadUrl },
+        audio: { 
+          url: result.download.main 
+        },
         mimetype: 'audio/mpeg',
-        fileName: `${audioInfo.title}.mp3`,
-        caption: `🎵 *${audioInfo.title}*\n⏱️ ${audioInfo.duration || 'Unknown'}\n📁 Format: ${audioInfo.format || 'mp3'}`
+        fileName: `${(result.title || 'audio').replace(/[^\w\s]/gi, '')}.mp3`,
+        ptt: false 
       },
       { quoted: m }
     )
     
   } catch (error) {
     console.error('[YTMP3 ERROR]', error)
-    m.reply('❌ Error: ' + error.message)
+    
+    if (error.code === 'ECONNABORTED') {
+      m.reply('❌ Timeout: Server terlalu lama merespons.')
+    } else if (error.response?.status === 404) {
+      m.reply('❌ Video tidak ditemukan atau URL tidak valid.')
+    } else {
+      m.reply('❌ Error: ' + (error.message || 'Gagal memproses'))
+    }
   }
 }
 

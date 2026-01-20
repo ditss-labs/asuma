@@ -1,95 +1,52 @@
 import axios from 'axios'
 
-let play = async (m, { conn: Ditss, usedPrefix, text, command, reply }) => {
-  if (!text) {
-    return m.reply('What song do you want to play? *Example*: .play cupid')
-  }
+let play = async (m, { conn:Ditss, text, usedPrefix, command }) => {
+  if (!text) return m.reply(`Contoh: ${usedPrefix + command} cupid`)
   
   try {
-    await m.reply("bentar bang")
+    await m.reply("🔍 Mencari...")
     
-    // Search YouTube - Response: {status, results: []}
-    const searchUrl = `https://api.asuma.my.id/v1/search/youtube?q=${encodeURIComponent(text)}&apikey=demo`
-    const resSearch = await axios.get(searchUrl)
+    const searchUrl = `https://api.asuma.my.id/v1/search/youtube?q=${encodeURIComponent(text)}`
+    const searchRes = await axios.get(searchUrl)
     
-    // Perhatikan: results bukan result
-    if (!resSearch.data?.status || !resSearch.data?.results?.[0]) {
-      console.log('Response Asuma:', resSearch.data)
-      return m.reply('Tidak ditemukan hasil pencarian.')
+    if (!searchRes.data?.status || !searchRes.data?.results?.[0]) {
+      return m.reply('❌ Tidak ditemukan')
     }
     
-    const video = resSearch.data.results[0]  // <-- PAKAI 'results' bukan 'result'
-    console.log('Video found:', video.title)
+    const video = searchRes.data.results[0]
     
-    // Pastikan video memiliki 'id' (bukan playlist)
-    if (!video.id || video.url.includes('playlist')) {
-      return m.reply('Video tidak valid atau playlist. Cari lagu lain.')
-    }
-    
-    // Filter durasi maksimal 10 menit (600 detik)
     const durationMatch = video.duration.match(/\d+/)
     const durationSeconds = durationMatch ? parseInt(durationMatch[0]) : 0
+    if (durationSeconds > 600) return m.reply('❌ Lagu terlalu panjang')
     
-    if (durationSeconds > 600) {
-      return m.reply(`Lagu terlalu panjang (${Math.round(durationSeconds/60)} menit). Maksimal 10 menit.`)
+    const downloadUrl = `https://api.asuma.my.id/v1/download/youtube?url=${encodeURIComponent(video.url)}&quality=mp3`
+    const downloadRes = await axios.get(downloadUrl)
+    
+    if (!downloadRes.data?.status || !downloadRes.data?.result?.download?.main) {
+      return m.reply('❌ Gagal download audio')
     }
     
-    // Download MP3 from nekolabs
-    const downloadUrl = `https://api.nekolabs.web.id/downloader/youtube/v1?url=${encodeURIComponent(video.url)}&format=mp3`
-    const resDownload = await axios.get(downloadUrl)
-    const result = resDownload.data
+    const audioUrl = downloadRes.data.result.download.main
+    const title = downloadRes.data.result.title || video.title
     
-    // Sesuaikan dengan struktur response nekolabs
-    if (!result.success || !result.result) {
-      return m.reply(result.message || 'Gagal mengambil data MP3.')
-    }
-    
-    const audioInfo = result.result
-    
-    if (!audioInfo.downloadUrl) {
-      return m.reply('Link download tidak tersedia.')
-    }
-    
-    // Kirim audio
     await Ditss.sendMessage(
       m.chat,
       {
-        audio: { url: audioInfo.downloadUrl },
-        mimetype: 'audio/mpeg',
-        fileName: `${audioInfo.title || video.title}.mp3`,
-        contextInfo: {
-          forwardingScore: 100000,
-          isForwarded: true,
-          externalAdReply: {
-            showAdAttribution: false,
-            containsAutoReply: true,
-            mediaType: 1,
-            renderLargerThumbnail: true,
-            title: audioInfo.title || video.title,
-            body: `Duration: ${audioInfo.duration || video.duration || 'Unknown'}`,
-            previewType: 'PHOTO',
-            thumbnailUrl: audioInfo.cover || video.thumbnail || 'https://telegra.ph/file/7d72a6f513123a113617a.jpg',
-          },
-        },
+        audio: { url: audioUrl },
+        fileName: title + '.mp3',
+        caption: `🎵 ${title}`
       },
       { quoted: m }
     )
     
-    // React
-    await Ditss.sendMessage(m.chat, {
-      react: { text: '✅', key: m.key },
-    })
-
-  } catch (error) {
-    console.error('[PLAY ERROR]', error)
-    m.reply('Terjadi kesalahan: ' + error.message)
+  } catch {
+    m.reply('❌ Error')
   }
 }
 
-// 🏷️ Metadata plugin
 play.help = ['play <judul lagu>']
 play.tags = ['downloader']
-play.command = ['play']
+play.command = ['play', 'song']
 play.limit = 3
 
 export default play

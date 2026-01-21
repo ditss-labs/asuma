@@ -30,14 +30,13 @@ let play = async (m, { conn:Ditss, text, usedPrefix, command }) => {
     const title = downloadRes.data.result.title || video.title
     
     await Ditss.sendMessage(
-      m.chat,
-      {
-        audio: { url: audioUrl },
-        fileName: title + '.mp3',
-        caption: `🎵 ${title}`
-      },
-      { quoted: m }
-    )
+    m.chat,
+    {
+      audio: { url: audioUrl },
+      mimetype: 'audio/ogg; codecs=opus',
+    },
+    { quoted: m }
+  )
     
   } catch {
     m.reply('❌ Error')

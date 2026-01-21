@@ -2,16 +2,89 @@ import fetch from 'node-fetch'
 import { generateWAMessageFromContent, generateWAMessageContent } from '@whiskeysockets/baileys'
 import { proto } from '@whiskeysockets/baileys'
 
-let cnn = async (m, { conn: Ditss }) => {
-  try {
-    await m.reply('⏳ Mengambil berita...')
+let antara = async (m, { conn: Ditss, text, usedPrefix, command }) => {
+  const types = [
+    "terkini",
+    "top-news", 
+    "politik",
+    "hukum",
+    "ekonomi",
+    "metro",
+    "sepakbola",
+    "olahraga",
+    "humaniora",
+    "lifestyle",
+    "hiburan",
+    "dunia",
+    "infografik",
+    "tekno",
+    "otomotif",
+    "warta-bumi",
+    "rilis-pers"
+  ]
+  
+  if (!text) {
+    let buttons = [
+      {
+        buttonId: "antara",
+        buttonText: { displayText: "📰 Pilih Kategori Berita" },
+        type: 4,
+        nativeFlowInfo: {
+          name: "single_select",
+          paramsJson: JSON.stringify({
+            title: "📊 Pilih Kategori Berita Antara",
+            sections: [
+              {
+                title: "Kategori Berita",
+                rows: types.slice(0, 8).map(type => ({
+                  title: `📰 ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+                  description: `Berita kategori ${type}`,
+                  id: `.${command} ${type}`
+                }))
+              },
+              {
+                title: "Kategori Berita (Lanjutan)",
+                rows: types.slice(8).map(type => ({
+                  title: `📰 ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+                  description: `Berita kategori ${type}`,
+                  id: `.${command} ${type}`
+                }))
+              }
+            ]
+          })
+        }
+      }
+    ]
     
-    const apiUrl = `https://asuma.my.id/v1/berita/antara-news?category=terkini`
+    await Ditss.sendMessage(
+      m.chat,
+      {
+        text: `📰 *Berita Antara News*\n\nGunakan perintah: ${usedPrefix + command} <kategori>\nContoh: ${usedPrefix + command} politik\n\nAtau klik tombol di bawah untuk memilih kategori:`,
+        footer: '© Powered by Asuma API',
+        buttons,
+        headerType: 1,
+        viewOnce: true
+      },
+      { quoted: m }
+    )
+    return
+  }
+  
+  const category = text.toLowerCase().trim()
+  
+  if (!types.includes(category)) {
+    return m.reply(`❌ Kategori tidak valid!\n\nKategori tersedia: ${types.join(', ')}`)
+  }
+  
+  try {
+    await m.reply(`⏳ Mengambil berita ${category}...`)
+    
+    const apiUrl = `https://api.asuma.my.id/v1/berita/antara-news?category=${category}`
     const res = await fetch(apiUrl)
     const json = await res.json()
     
     if (!json.status || !json.result?.data || !json.result.data.length) {
-      return m.reply('❌ Tidak ditemukan berita')
+      return m.reply(`❌ Tidak ada berita untuk kategori "${category}"`)
     }
     
     async function createImage(url) {
@@ -32,7 +105,7 @@ let cnn = async (m, { conn: Ditss }) => {
           text: b.description || 'Tidak ada deskripsi'
         }),
         footer: proto.Message.InteractiveMessage.Footer.fromObject({
-          text: b.isoDate ? new Date(b.isoDate).toLocaleDateString('id-ID') : 'Berita Terkini'
+          text: b.isoDate ? new Date(b.isoDate).toLocaleDateString('id-ID') : 'Berita'
         }),
         header: proto.Message.InteractiveMessage.Header.fromObject({
           title: b.title,
@@ -61,7 +134,7 @@ let cnn = async (m, { conn: Ditss }) => {
           },
           interactiveMessage: proto.Message.InteractiveMessage.fromObject({
             body: proto.Message.InteractiveMessage.Body.create({
-              text: `📰 *Berita Terkini - Antara News*`
+              text: `📰 *${category.toUpperCase()} - Antara News*`
             }),
             footer: proto.Message.InteractiveMessage.Footer.create({
               text: `Total: ${json.result.total} berita • ${json.creator}`
@@ -86,9 +159,9 @@ let cnn = async (m, { conn: Ditss }) => {
   }
 }
 
-cnn.help = ['cnn']
-cnn.tags = ['news', 'berita']
-cnn.command = ['antara']
-cnn.limit = 2
+antara.help = ['antara <kategori>']
+antara.tags = ['news']
+antara.command = ['antara', 'antaranews']
+antara.limit = 2
 
-export default cnn
+export default antara

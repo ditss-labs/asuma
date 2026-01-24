@@ -29,14 +29,29 @@ let play = async (m, { conn:Ditss, text, usedPrefix, command }) => {
     const audioUrl = downloadRes.data.result.download.main
     const title = downloadRes.data.result.title || video.title
     
-    await Ditss.sendMessage(
-    m.chat,
-    {
-      audio: { url: audioUrl },
-      mimetype: 'audio/ogg; codecs=opus',
-    },
-    { quoted: m }
-  )
+      await Ditss.sendMessage(
+      m.chat,
+      {
+        audio: { url: audioUrl },
+        mimetype: 'audio/mpeg',
+        fileName: `${title}.mp3`,
+        contextInfo: {
+          forwardingScore: 100000,
+          isForwarded: true,
+          externalAdReply: {
+            showAdAttribution: false,
+            containsAutoReply: true,
+            mediaType: 1,
+            renderLargerThumbnail: true,
+            title: title,
+            body: `Duration: ${video.duration || video.duration || 'Unknown'}`,
+            previewType: 'PHOTO',
+            thumbnailUrl: downloadRes.data.result.cover || audioInfo.cover || video.thumbnail || 'https://telegra.ph/file/7d72a6f513123a113617a.jpg',
+          },
+        },
+      },
+      { quoted: m }
+    )
     
   } catch {
     m.reply('❌ Error')

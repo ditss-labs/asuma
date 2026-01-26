@@ -32,6 +32,7 @@ import { getBuffer } from './lib/fetchBuffer.js';
 import { JadiBot, StopJadiBot, ListJadiBot } from './lib/jadibot.js';
 import { detectOperator } from './lib/func/detectOperator.js';
 import { logErrorToFile } from './lib/utils/logErrorToFile.js';
+import { levelUp } from './lib/func/levelup.js';
 import { fetchJson } from './lib/utils/fetchJson.js';
 import { UguuSe, webp2mp4File, CatBox, AsumaCdn } from './lib/utils/uploader.js'
 import { getRandom } from './lib/utils.js';

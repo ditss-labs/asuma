@@ -846,7 +846,7 @@ if (isCmd && !m.fromMe) {
         filesize = body?.length || 0
     }
 
-    let CrotoneE = await detectOperator(nomore)
+    //let CrotoneE = await detectOperator(nomore)
     let sizeSuffix = ['', ...'KMGTP'][Math.floor(Math.log(filesize || 1) / Math.log(1000))] || ''
     let sizePretty = filesize === 0 ? 0 : (filesize / 1000 ** Math.floor(Math.log(filesize) / Math.log(1000))).toFixed(1)
     let chatName = await Ditss.getName(m.chat)

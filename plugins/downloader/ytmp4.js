@@ -14,7 +14,7 @@ let ytmp4 = async (m, { conn: Ditss, text, usedPrefix, command }) => {
     }
     
     const encodedUrl = encodeURIComponent(url)
-    const apiUrl = `https://api.asuma.my.id/v1/download/youtube?url=${encodedUrl}&quality=${quality}`
+    const apiUrl = `${global.api.domain}/v1/download/youtube?url=${encodedUrl}&quality=${quality}`
     
     const response = await axios.get(apiUrl, { timeout: 45000 })
     const { status, creator, result } = response.data

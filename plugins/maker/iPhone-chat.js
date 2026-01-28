@@ -7,8 +7,8 @@ let iqc = async (m, { conn: Ditss, text, usedPrefix, command }) => {
   await m.react("💬");
   
   try {
-    const API_KEY = 'demo';
-    const apiUrl = `https://api.asuma.my.id/v2/maker/imessage?apikey=${API_KEY}&text=${encodeURIComponent(text)}`;
+    const API_KEY = `${global.api.key}`;
+    const apiUrl = `${global.api.domain}/v2/maker/imessage?apikey=${API_KEY}&text=${encodeURIComponent(text)}`;
     
     const response = await axios.get(apiUrl, {
       responseType: 'arraybuffer',

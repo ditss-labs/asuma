@@ -4,7 +4,7 @@ let ytsearch = async (m, { conn: Ditss, text, usedPrefix, command }) => {
   if (!text) return m.reply(`🔍 *Contoh penggunaan:*\n${usedPrefix + command} lathi\n${usedPrefix + command} hindia rumah ke rumah`)
   
   try {
-    const searchUrl = `https://api.asuma.my.id/v1/search/youtube?q=${encodeURIComponent(text)}&apikey=demo`
+    const searchUrl = `${global.api.domain}/v1/search/youtube?q=${encodeURIComponent(text)}&apikey=demo`
     const response = await axios.get(searchUrl)
     
     if (!response.data?.status || !response.data?.results?.[0]) {

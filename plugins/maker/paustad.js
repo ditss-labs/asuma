@@ -8,7 +8,7 @@ let pakustadz = async (m, { conn: Ditss, text, usedPrefix, command }) => {
   
   try {
     const version = Math.random() > 0.5 ? 'v1' : 'v2';
-    const apiUrl = `https://api.asuma.my.id/${version}/maker/pakustadz?apikey=demo&teks=${encodeURIComponent(text)}`;
+    const apiUrl = `${global.api.domain}/${version}/maker/pakustadz?apikey=demo&teks=${encodeURIComponent(text)}`;
     
     const response = await axios.post(apiUrl, null, {
       responseType: 'arraybuffer',

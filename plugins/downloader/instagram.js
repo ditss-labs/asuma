@@ -9,7 +9,7 @@ let handler = async (m, { conn: Ditss, text }) => {
   if (!/instagram\.com/.test(text))
     return m.reply('❌ Itu bukan link Instagram.')
 
-  const apiBase = 'https://api.asuma.my.id/v1/downloader/igpost?url='
+  const apiBase = `${global.api.domain}/v1/downloader/igpost?apikey=${global.api.key}url=`
   const apiUrl = apiBase + encodeURIComponent(text)
 
   let json = null

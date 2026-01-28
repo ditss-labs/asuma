@@ -9771,13 +9771,15 @@ Terima kasih sudah pakai Asuma Multi Device 💙
         console.warn('[⚠️ LIMIT BLOCKED]');
         return;
     }
-
+		
+		const pesanyo =  `👋 Halo owner, ada error yang perlu dicek.\n\n` +
+                  `📦 Version: *${pkg.version}*\n\n` +
+                  `🪵 *Log error:*\n\n${util.format(e)}`;
+		await sendNotification(pesanyo);
     await Ditss.sendMessage(
         global.info.owner[0] + "@s.whatsapp.net",
         {
-            text: `👋 Halo owner, ada error yang perlu dicek.\n\n` +
-                  `📦 Version: *${pkg.version}*\n\n` +
-                  `🪵 *Log error:*\n\n${util.format(e)}`,
+            text: pesanyo,
             contextInfo: { isForwarded: true }
         },
         { quoted: m }

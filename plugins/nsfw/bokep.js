@@ -6,7 +6,7 @@ let bokep = async (m, { conn: Ditss }) => {
       react: { text: '⏳', key: m.key }
     });
 
-    const apiUrl = 'http://api.asuma.my.id/v2/nsfw/bkp';
+    const apiUrl = `${global.api.domain}/v2/nsfw/bkp`;
 
     const response = await axios.post(apiUrl, {
       responseType: 'arraybuffer',

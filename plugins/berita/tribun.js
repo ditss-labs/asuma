@@ -43,7 +43,7 @@ let tribun = async (m, { conn: Ditss, text, usedPrefix, command }) => {
   try {
     await m.reply(`⏳ Mengambil berita ${category} di ${zone}...`)
     
-    const apiUrl = `https://api.asuma.my.id/v1/berita/tribun-news?city=${zone}&category=${category}`
+    const apiUrl = `${global.api.domain}/v1/berita/tribun-news?apikey=${global.api.key}&city=${zone}&category=${category}`
     const res = await fetch(apiUrl)
     const json = await res.json()
     

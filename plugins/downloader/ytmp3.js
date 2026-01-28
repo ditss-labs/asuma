@@ -5,7 +5,7 @@ let ytmp3 = async (m, { conn: Ditss, text, usedPrefix, command }) => {
   
   try {
     const encodedUrl = encodeURIComponent(text.trim())
-    const apiUrl = `https://api.asuma.my.id/v1/download/youtube?url=${encodedUrl}&quality=mp3`
+    const apiUrl = `${global.api.domain}/v1/download/youtube?url=${encodedUrl}&quality=mp3`
     const response = await axios.get(apiUrl, {
       timeout: 90000 // 
     })

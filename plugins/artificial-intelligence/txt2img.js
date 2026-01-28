@@ -4,8 +4,6 @@ import { dirname } from 'path';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
-// Export fungsi utama
 const cimage = async (m, { conn: Ditss, args, usedPrefix }) => {
     let fullPrompt = args.join(" ");
 
@@ -18,9 +16,8 @@ const cimage = async (m, { conn: Ditss, args, usedPrefix }) => {
             m.reply("⏳ Sedang membuat gambar...");
 
             try {
-                const apiUrl = `https://api.asuma.my.id/v1/ai/unrestricted?prompt=${encodeURIComponent(prompt)}&style=${encodeURIComponent(style)}&apikey=demo`;
+                const apiUrl = `${global.api.domain}/v1/ai/unrestricted?prompt=${encodeURIComponent(prompt)}&style=${encodeURIComponent(style)}&apikey=${global.api.key}`;
                 const result = await axios.get(apiUrl);
- //m.reply(result)
                await Ditss.sendMessage(
                     m.chat,
                     {
@@ -111,7 +108,6 @@ const cimage = async (m, { conn: Ditss, args, usedPrefix }) => {
     }
 };
 
-// Metadata untuk command
 cimage.help = ["cimage"];
 cimage.tags = ["ai", "image"];
 cimage.command = ["txt2img", "aiimage", "txt2image"];

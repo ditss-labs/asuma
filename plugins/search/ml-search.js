@@ -7,7 +7,7 @@ let handler = async (m, { conn: Ditss, text }) => {
     )
 
   const hero = text.toLowerCase().trim()
-  const url = `https://api.asuma.my.id/v1/mobile-legends/hero?hero=${encodeURIComponent(hero)}`
+  const url = `${global.api.domain}/v1/mobile-legends/hero?hero=${encodeURIComponent(hero)}`
 
   let json
   try {

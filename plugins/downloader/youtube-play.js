@@ -6,7 +6,7 @@ let play = async (m, { conn:Ditss, text, usedPrefix, command }) => {
   try {
     await m.reply("🔍 Mencari...")
     
-    const searchUrl = `https://api.asuma.my.id/v1/search/youtube?q=${encodeURIComponent(text)}`
+    const searchUrl = `${global.api.domain}/v1/search/youtube?q=${encodeURIComponent(text)}`
     const searchRes = await axios.get(searchUrl)
     
     if (!searchRes.data?.status || !searchRes.data?.results?.[0]) {
@@ -19,7 +19,7 @@ let play = async (m, { conn:Ditss, text, usedPrefix, command }) => {
     const durationSeconds = durationMatch ? parseInt(durationMatch[0]) : 0
     if (durationSeconds > 600) return m.reply('❌ Lagu terlalu panjang')
     
-    const downloadUrl = `https://api.asuma.my.id/v1/download/youtube?url=${encodeURIComponent(video.url)}&quality=mp3`
+    const downloadUrl = `${global.api.domain}/v1/download/youtube?url=${encodeURIComponent(video.url)}&quality=mp3`
     const downloadRes = await axios.get(downloadUrl)
     
     if (!downloadRes.data?.status || !downloadRes.data?.result?.download?.main) {

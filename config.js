@@ -53,6 +53,8 @@ global.money = {
 }
 
 global.api = {
+	domain: "https://ditss.vercel.app",
+	key: "demo",
     ditss: "https://ditss.vercel.app",
     example: "https://example.com/api"
 };

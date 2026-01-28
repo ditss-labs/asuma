@@ -6,7 +6,7 @@ let voa = async (m, { conn: Ditss, usedPrefix, command }) => {
   try {
     await m.reply('⏳ Mengambil berita VOA...')
     
-    const apiUrl = `https://api.asuma.my.id/v1/berita/voa-news`
+    const apiUrl = `${global.api.domain}/v1/berita/voa-news?apikey=${global.api.key}`
     const res = await fetch(apiUrl)
     const json = await res.json()
     

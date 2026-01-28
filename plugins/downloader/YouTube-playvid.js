@@ -6,7 +6,7 @@ let playvideo = async (m, { conn, text, usedPrefix, command }) => {
   try {
     await m.reply("🔍 Mencari...")
     
-    const searchUrl = `https://api.asuma.my.id/v1/search/youtube?q=${encodeURIComponent(text)}`
+    const searchUrl = `${global.api.domain}/v1/search/youtube?q=${encodeURIComponent(text)}&apikey=${global.api.key}`
     const searchRes = await axios.get(searchUrl)
     
     if (!searchRes.data?.status || !searchRes.data?.results?.[0]) {
@@ -15,7 +15,7 @@ let playvideo = async (m, { conn, text, usedPrefix, command }) => {
     
     const video = searchRes.data.results[0]
     
-    const downloadUrl = `https://api.asuma.my.id/v1/download/youtube?url=${encodeURIComponent(video.url)}&quality=360`
+    const downloadUrl = `${global.api.domain}/v1/download/youtube?url=${encodeURIComponent(video.url)}&quality=360&apikey=${global.api.key}`
     const downloadRes = await axios.get(downloadUrl)
     
     if (!downloadRes.data?.status || !downloadRes.data?.result?.download?.main) {

@@ -6,7 +6,7 @@ let brat = async (m, { conn: Ditss, text, command, reply, usedPrefix }) => {
   await m.react("🐱")
   try {
     let res = await axios.post(
-      `https://api.asuma.my.id/v2/maker/bratvid`,
+      `${global.api.domain}/v2/maker/bratvid`,
       {
         apikey: 'DitssGanteng',
         text: text

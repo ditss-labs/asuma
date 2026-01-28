@@ -40,7 +40,7 @@ const tiktokDownloader = async (m, { conn: Ditss, usedPrefix, command, args }) =
           title: data.music_info.title,
           body: `by ${data.music_info.author}`,
           thumbnailUrl: data.music_info.cover,
-          sourceUrl: 'https://api.asuma.my.id',
+          sourceUrl: 'https://asuma.my.id',
           mediaType: 1,
           showAdAttribution: true
         }
@@ -85,7 +85,7 @@ const tiktokDownloader = async (m, { conn: Ditss, usedPrefix, command, args }) =
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
       console.log(`[TIKTOK] Percobaan ke-${attempt} untuk URL: ${text}`);
-      const json = await fetchJson(`https://api.asuma.my.id/v1/downloader/tiktok?url=${encodeURIComponent(text)}`);
+      const json = await fetchJson(`${global.api.domain}/v1/downloader/tiktok?url=${encodeURIComponent(text)}`);
 
       if (!json.status || !json.result?.data) {
         throw new Error(`Percobaan ${attempt}: Data tidak valid`);

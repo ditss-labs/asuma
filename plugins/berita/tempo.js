@@ -72,7 +72,7 @@ let tempo = async (m, { conn: Ditss, text, usedPrefix, command }) => {
   try {
     await m.reply(`⏳ Mengambil berita ${category}...`)
     
-    const apiUrl = `https://api.asuma.my.id/v1/berita/tempo-news?category=${category}`
+    const apiUrl = `${global.api.domain}/v1/berita/tempo-news?apikey=${global.api.key}&category=${category}`
     const res = await fetch(apiUrl)
     const json = await res.json()
     

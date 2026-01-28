@@ -53,10 +53,10 @@ global.money = {
 }
 
 global.api = {
-	domain: "https://ditss.vercel.app",
+	domain: "https://api.asuma.my.id",
 	key: "demo",
     ditss: "https://ditss.vercel.app",
-    example: "https://example.com/api"
+    example: "https://example.com"
 };
 global.ress = {
     key: 'Apikey Anda telah habis',

@@ -5,7 +5,7 @@ let handler = async (m, { conn: Ditss, text }) => {
     if (!text) return m.reply('Contoh: .igstory jkt48.freya')
 
     const username = text.replace('@', '').trim()
-    const api = `https://api.asuma.my.id/v1/downloader/igstory?apikey=demo&username=${encodeURIComponent(username)}`
+    const api = `${global.api.domain}/v1/downloader/igstory?apikey=${global.api.key}&username=${encodeURIComponent(username)}`
 
     const res = await fetch(api)
     const json = await res.json()

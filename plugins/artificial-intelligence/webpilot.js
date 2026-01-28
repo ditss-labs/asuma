@@ -5,7 +5,7 @@ let ai = async (m, { conn: Ditss, text }) => {
   
   await Ditss.sendMessage(m.chat, { react: { text: "⏳", key: m.key } })
   
-  const apiUrl = `https://api.asuma.my.id/v1/tools/webpilot?q=${encodeURIComponent(text)}`
+  const apiUrl = `${global.api.domain}/v1/tools/webpilot?q=${encodeURIComponent(text)}&apikey=${global.api.key}`
   
   try {
     /*const response = await axios.get(apiUrl, {

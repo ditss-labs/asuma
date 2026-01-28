@@ -4,7 +4,7 @@ let handler = async (m, { conn: Ditss, text }) => {
   if (!text) return m.reply('Masukkan nama!\n\nContoh:\n.cekfemboy adit')
 
   const nama = text.trim()
-  const api = `https://api.asuma.my.id/v1/fun/cekfemboy?nama=${encodeURIComponent(nama)}`
+  const api = `${global.api.domain}/v1/fun/cekfemboy?nama=${encodeURIComponent(nama)}`
 
   let json
   try {

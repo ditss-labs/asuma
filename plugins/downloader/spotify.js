@@ -7,8 +7,8 @@ let spotify = async (m, { conn: Ditss, text, command }) => {
   
   const isUrl = text.includes('open.spotify.com')
   const apiUrl = isUrl 
-    ? `https://api.asuma.my.id/v1/tools/spotify?url=${encodeURIComponent(text)}&download=false`
-    : `https://api.asuma.my.id/v1/tools/spotify?query=${encodeURIComponent(text)}&download=false`
+    ? `${global.api.domain}/v1/tools/spotify?url=${encodeURIComponent(text)}&download=false`
+    : `${global.api.domain}/v1/tools/spotify?query=${encodeURIComponent(text)}&download=false`
   
   try {
     const response = await axios.post(apiUrl, {

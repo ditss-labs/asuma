@@ -5,7 +5,7 @@ let veo2 = async (m, { conn: Ditss, text }) => {
   
   await Ditss.sendMessage(m.chat, { react: { text: "⏳", key: m.key } })
   
-  const apiUrl = `https://api.asuma.my.id/v1/tools/veo2?prompt=${encodeURIComponent(text)}&apikey=demo`
+  const apiUrl = `${global.api.domain}/v1/tools/veo2?prompt=${encodeURIComponent(text)}&apikey=${global.api.key}`
   
   try {
     const response = await axios.get(apiUrl, {
@@ -21,8 +21,6 @@ let veo2 = async (m, { conn: Ditss, text }) => {
     }
     
     const { video_url, prompt } = data.result
-    
-    //await m.reply(`🎬 *VE02 AI Video Generator*\n\n📝 *Prompt:* ${prompt}\n🔗 *Video URL:* ${video_url}\n⏱️ *Waktu proses:* ${data.responseTime}\n\n⏳ *Mengunduh video...*`)
     
     const videoResponse = await axios.get(video_url, {
       responseType: 'arraybuffer',

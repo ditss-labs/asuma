@@ -7,7 +7,7 @@ let handler = async (m, { conn: Ditss, text }) => {
     )
 
   const url = text.trim()
-  const api = `https://api.asuma.my.id/v1/tools/alightmotion?url=${encodeURIComponent(url)}`
+  const api = `${global.api.domain}/v1/tools/alightmotion?url=${encodeURIComponent(url)}`
 
   let json
   try {

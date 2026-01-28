@@ -59,7 +59,7 @@ let fakektp = async (m, { conn: Ditss, text, command, reply, usedPrefix }) => {
 
   try {
     const res = await axios.get(
-      'https://api.asuma.my.id/v1/maker/fake-ktp',
+      `${global.api.domain}/v1/maker/fake-ktp`,
       {
         responseType: 'arraybuffer',
         params: {

@@ -3,7 +3,7 @@ let emoji = async (m, { conn: Ditss, usedPrefix, args, reply }) => {
 
     try {
         const emojiChar = encodeURIComponent(args[0]);
-        const url = `https://api.asuma.my.id/v1/tools/emoji?emoji=${emojiChar}&apikey=demo`;
+        const url = `${global.api.domain}/v1/tools/emoji?emoji=${emojiChar}&apikey=${global.api.key}`;
         const res = await fetch(url);
         if (!res.ok) throw new Error('Gagal mendapatkan emoji');
         const buffer = await res.arrayBuffer();

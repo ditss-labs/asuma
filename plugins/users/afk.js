@@ -11,4 +11,4 @@ afk.help = ['afk [alasan]']
 afk.tags = ['main']
 afk.command = ['afk']
 
-export default afk
+export default afk 
